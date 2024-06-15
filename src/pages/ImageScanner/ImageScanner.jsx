@@ -7,7 +7,7 @@ import axios from "axios";
 import dataContext from "../../Store/DataContext";
 import { REACT_APP_IP } from "../../services/common";
 import RemoveTemplate from "./RemoveTemplate";
-import EditTemplate from "./EditTemplate";
+
 import TemplateData from "./TemplateData";
 import CoordinateData from "./CoordinateData";
 import OptionData from "./OptionData";
@@ -21,24 +21,17 @@ const ImageScanner = () => {
   const [inputField, setInputField] = useState("");
   const [fieldType, setFieldType] = useState("");
   const [removeModal, setRemoveModal] = useState(false);
-  const [editId, setEditID] = useState("");
   const [removeId, setRemoveId] = useState("");
-  const [editInput, setEditInput] = useState("");
-  const [editModal, setEditModal] = useState(false);
   const [selectType, setSelectType] = useState("");
   const [inputCount, setInputCount] = useState(0);
   const [inputValues, setInputValues] = useState([]);
   const [lengthOfField, setLengthOfField] = useState("");
   const [open, setOpen] = useState(false);
   const [optionModel, setOptionModel] = useState(false);
-  const [typeOfOption, setTypeOfOption] = useState({
-    start: "",
-    end: "",
-  });
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const cancelButtonRef = useRef(null);
   const dataCtx = useContext(dataContext);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedCoordinateData, setSelectedCoordinateData] = useState(null);
   const [templateData, setTemplateData] = useState({
     name: "",
     pageCount: "",
@@ -81,14 +74,6 @@ const ImageScanner = () => {
             name: dataCtx?.templateData?.templateData?.name,
             pageCount: dataCtx?.templateData?.templateData?.pageCount,
           }));
-          const [a, b] =
-            dataCtx?.templateData?.templateData?.typeOption?.split("-");
-          setTypeOfOption((prevState) => ({
-            ...prevState,
-            start: a,
-            end: b,
-          }));
-
           setSelectedCoordinates(selectedCoordinatesData);
         }
       }
@@ -140,7 +125,6 @@ const ImageScanner = () => {
     if (dragStart) {
       setDragStart(null);
       setOpen(true);
-      // Remove event listener for mousemove when dragging ends
     }
   };
   // Function to handle mouse move event for drag selection
@@ -169,6 +153,14 @@ const ImageScanner = () => {
   const onResetHandler = () => {
     setDragStart(null);
     setSelection(null);
+    setQuestionRange({
+      min: "",
+      max: "",
+    });
+    setFieldType("");
+    setLengthOfField("");
+    setSelectType("");
+    setInputField("");
     setOpen(false);
   };
 
@@ -240,7 +232,39 @@ const ImageScanner = () => {
           : "0",
       fieldLength: fieldType === "formField" ? lengthOfField : 0,
     };
-    setSelectedCoordinates((prev) => [...prev, newObj]);
+
+    if (selectedCoordinateData) {
+      const updatedObj = {
+        attribute:
+          fieldType === "formField"
+            ? inputField
+            : questionRange.min + "--" + questionRange.max,
+        coordinateX: selectedCoordinateData.coordinateX,
+        coordinateY: selectedCoordinateData.coordinateY,
+        dataFieldType: selectType,
+        fId: selectedCoordinateData.fId,
+        fieldLength: fieldType === "formField" ? lengthOfField : 0,
+        fieldRange:
+          selectType === "number"
+            ? questionRange.min + "--" + questionRange.max
+            : "0",
+        fieldType: fieldType,
+        height: selectedCoordinateData.height,
+        pageNo: selectedCoordinateData.pageNo,
+        width: selectedCoordinateData.width,
+      };
+      const updatedSelectedCoordinate = selectedCoordinates.map((data) => {
+        if (data.fId === selectedCoordinateData.fId) {
+          return updatedObj;
+        }
+        return data;
+      });
+      setSelectedCoordinates(updatedSelectedCoordinate);
+    } else {
+      console.log(newObj);
+      setSelectedCoordinates((prev) => [...prev, newObj]);
+    }
+
     setInputField("");
     setFieldType("");
     setOpen(false);
@@ -250,6 +274,7 @@ const ImageScanner = () => {
       min: "",
       max: "",
     });
+    setSelectedCoordinateData(null);
     toast.success("Coordinate successfully added.");
   };
 
@@ -287,17 +312,17 @@ const ImageScanner = () => {
       case "upper":
         characters = Array.from({ length: inputValues.length }, (_, index) =>
           String.fromCharCode(65 + index)
-        ); // 'A' to 'Z'
+        );
         break;
       case "lower":
         characters = Array.from({ length: inputValues.length }, (_, index) =>
           String.fromCharCode(97 + index)
-        ); // 'a' to 'z'
+        );
         break;
       case "number":
         characters = Array.from({ length: inputValues.length }, (_, index) =>
           (index + 1).toString()
-        ); // '1' to '5'
+        );
         break;
       default:
         characters = Array(inputValues.length).fill("");
@@ -377,41 +402,36 @@ const ImageScanner = () => {
 
     return new Blob(byteArrays, { type: contentType });
   }
-  const onEditCoordinateHanlder = () => {
-    if (!editInput) {
-      toast.warning("Please enter the new name.");
-      return;
-    }
 
-    const updatedData = selectedCoordinates.map((coordinate) => {
-      if (editId === coordinate.fId) {
-        return { ...coordinate, attribute: editInput };
-      }
-
-      return coordinate;
-    });
-    setSelectedCoordinates(updatedData);
-    setEditID("");
-    setEditInput("");
-    setEditModal(false);
-    toast.success("Successfully updated coordinate name.");
-  };
-
+  // OPTIONS INPUTS
   const handleInputChange = (e, type, index) => {
     const newInputValues = [...inputValues];
     const inputValue = e.target.value.trim();
-
     if (selectedRow === "upper") {
-      newInputValues[index][type] =
-        inputValue.length === 1 ? inputValue.toUpperCase() : "";
+      // Allow only uppercase letters A-Z
+      if (/^[A-Z]$/.test(inputValue)) {
+        newInputValues[index][type] = inputValue;
+      } else {
+        newInputValues[index][type] = "";
+      }
     } else if (selectedRow === "lower") {
-      newInputValues[index][type] =
-        inputValue.length === 1 ? inputValue.toLowerCase() : "";
+      // Allow only lowercase letters a-z
+      if (/^[a-z]$/.test(inputValue)) {
+        newInputValues[index][type] = inputValue;
+      } else {
+        newInputValues[index][type] = "";
+      }
     } else if (selectedRow === "number") {
-      newInputValues[index][type] = /^\d+$/.test(inputValue) ? inputValue : "";
+      // Allow only digits 0-9
+      if (/^\d+$/.test(inputValue)) {
+        newInputValues[index][type] = inputValue;
+      } else {
+        newInputValues[index][type] = "";
+      }
     } else {
       newInputValues[index][type] = inputValue;
     }
+
     setInputValues(newInputValues);
   };
 
@@ -442,6 +462,41 @@ const ImageScanner = () => {
     );
   };
 
+  const onEditCoordinateDataHanlder = (id) => {
+    const selectedCoordinate = selectedCoordinates.find(
+      (data) => data.fId === id
+    );
+
+    if (selectedCoordinate.fieldType === "formField") {
+      setFieldType("formField");
+      setSelectType(selectedCoordinate.dataFieldType);
+      setLengthOfField(selectedCoordinate.fieldLength);
+      setInputField(selectedCoordinate.attribute);
+      console.log(selectType);
+
+      if (selectedCoordinate.dataFieldType === "number") {
+        const [min, max] = selectedCoordinate.fieldRange.split("--");
+        setQuestionRange((prev) => ({
+          ...prev,
+          min: min,
+          max: max,
+        }));
+      }
+    } else if (selectedCoordinate.fieldType === "questionsField") {
+      setFieldType("questionsField");
+      const [min, max] = selectedCoordinate.attribute.split("--");
+      setQuestionRange((prev) => ({
+        ...prev,
+        min: min,
+        max: max,
+      }));
+    }
+    setSelectedCoordinateData(selectedCoordinate);
+    setOpen(true);
+  };
+
+  console.log(selectedCoordinateData);
+
   return (
     <div className="flex flex-col-reverse lg:flex-row justify-center items-center scannerbg bg-gradient-to-r from-blue-700 to-purple-800 border-1 pt-20 ">
       {/* LEFT SECTION  */}
@@ -449,25 +504,15 @@ const ImageScanner = () => {
         <div className="flex flex-1  flex-col justify-between ">
           <TemplateData
             selectedCoordinates={selectedCoordinates}
-            setEditID={setEditID}
-            setEditModal={setEditModal}
             setRemoveModal={setRemoveModal}
             setRemoveId={setRemoveId}
             templateData={templateData}
+            onEditCoordinateDataHanlder={onEditCoordinateDataHanlder}
             setTemplateData={setTemplateData}
             setOptionModel={setOptionModel}
           />
         </div>
       </div>
-
-      {/* EDIT COMPONENT  */}
-      <EditTemplate
-        onEditCoordinateHanlder={onEditCoordinateHanlder}
-        editModal={editModal}
-        editInput={editInput}
-        setEditInput={setEditInput}
-        setEditModal={setEditModal}
-      />
 
       {/* DELETE COMPONENT  */}
       <RemoveTemplate
@@ -564,7 +609,6 @@ const ImageScanner = () => {
                       <CoordinateData
                         onSelectedHandler={onSelectedHandler}
                         open={open}
-                        cancelButtonRef={cancelButtonRef}
                         setOpen={setOpen}
                         onResetHandler={onResetHandler}
                         fieldType={fieldType}

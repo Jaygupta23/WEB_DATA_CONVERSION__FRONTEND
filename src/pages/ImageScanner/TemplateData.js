@@ -4,13 +4,12 @@ import { CiEdit } from "react-icons/ci";
 
 const TemplateData = ({
   selectedCoordinates,
-  setEditID,
-  setEditModal,
   setRemoveModal,
   setRemoveId,
   templateData,
   setTemplateData,
   setOptionModel,
+  onEditCoordinateDataHanlder,
 }) => {
   return (
     <div className="px-4 py-6">
@@ -45,10 +44,7 @@ const TemplateData = ({
                       </div>
                       <div className="whitespace-nowrap px-4 py-2 text-center font-semibold text-md text-gray-900 w-1/3">
                         <CiEdit
-                          onClick={() => {
-                            setEditID(data.fId);
-                            setEditModal(true);
-                          }}
+                          onClick={() => onEditCoordinateDataHanlder(data.fId)}
                           className="mx-auto text-blue-500 text-xl cursor-pointer hover:text-2xl hover:font-bold"
                         />
                       </div>

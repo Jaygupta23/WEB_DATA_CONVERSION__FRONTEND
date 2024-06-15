@@ -99,6 +99,7 @@ const DataMatching = () => {
     const fetchTemplate = async () => {
       try {
         const response = await onGetTemplateHandler();
+        console.log(response);
         const templateData = response.find(
           (data) => data.id === parseInt(currentTaskData.templeteId)
         );

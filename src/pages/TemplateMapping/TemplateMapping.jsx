@@ -77,9 +77,6 @@ const TemplateMapping = () => {
       const [min, max] = templateHeader.split("--");
       const newMin = parseInt(min);
       const newMax = parseInt(max);
-
-      console.log(min, max);
-
       // Loop through all headers
       Object.keys(selectedAssociations).forEach((header) => {
         const questionNumber = parseInt(header.replace(/\D/g, ""));
@@ -113,8 +110,20 @@ const TemplateMapping = () => {
       }
     }
 
+    const associationData = [];
+    const obj = { ...selectedAssociations };
+    for (let i = 0; i < csvHeaders.length; i++) {
+      const header = csvHeaders[i];
+      if (obj.hasOwnProperty(header)) {
+        associationData.push({
+          key: header,
+          value: obj[header],
+        });
+      }
+    }
+
     const mappedData = {
-      ...selectedAssociations,
+      associationData: associationData,
       fileId: fileId,
     };
 
@@ -175,7 +184,6 @@ const TemplateMapping = () => {
                         key={index}
                         className="flex w-full justify-around mb-3"
                       >
-                        {console.log(csvHeader)}
                         <select
                           className="block w-1/3 py-1 me-10 text-xl font-semibold text-center border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
                           aria-label="CSV Header Name"

@@ -35,7 +35,7 @@ const DynamicInput = ({
               type="text"
               className="border border-gray-300 text-center rounded px-3 py-2 w-[48%] sm:w-[17%]"
               value={inputValues[i]?.upper || alphabet[i % 26]}
-              onChange={(e) => (e, "upper", i)}
+              onChange={(e) => handleInputChange(e, "upper", i)}
               placeholder={`Upper ${i + 1}`}
               disabled={selectedRow !== "upper"}
             />
