@@ -13,6 +13,12 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { LuLoader } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import AdminAssined from "./AdminAssined";
+import DataOption from "./DataOption";
+import UserTaskAssined from "./UserTaskAssined";
+import FormDataSection from "./FormDataSection";
+import QuestionsDataSection from "./QuestionsDataSection";
+import ImageSection from "./ImageSection";
+import ButtonSection from "./ButtonSection";
 
 const DataMatching = () => {
   const [popUp, setPopUp] = useState(true);
@@ -25,6 +31,7 @@ const DataMatching = () => {
   const [imageColNames, setImageColNames] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [blankCount, setBlackCount] = useState(1);
+  const [pattern, setPattern] = useState("");
   const [currentTaskData, setCurrentTaskData] = useState({});
   const [selectedCoordintes, setSelectedCoordinates] = useState(false);
   const [blankChecked, setBlankChecked] = useState(false);
@@ -99,7 +106,6 @@ const DataMatching = () => {
     const fetchTemplate = async () => {
       try {
         const response = await onGetTemplateHandler();
-        console.log(response);
         const templateData = response.find(
           (data) => data.id === parseInt(currentTaskData.templeteId)
         );
@@ -113,7 +119,6 @@ const DataMatching = () => {
 
   // Api for updating the csv data in the backend
   const onCsvUpdateHandler = async () => {
-    console.log("Proble");
     if (!modifiedKeys) {
       onImageHandler("next", currentIndex, csvData, currentTaskData);
       toast.success("Data updated successfully.");
@@ -149,6 +154,14 @@ const DataMatching = () => {
     }
   };
 
+  // Check is current data is OK
+
+  const isCurrentDataCurrect = (currentData) => {
+    const csvDataKeys = Object.keys(csvData[0]);
+    console.log(csvDataKeys);
+    console.log(templateHeaders);
+  };
+
   // Sortcuts buttons
   useEffect(() => {
     if (!popUp) {
@@ -156,7 +169,6 @@ const DataMatching = () => {
         if (event.ctrlKey && event.key === "ArrowLeft") {
           setPopUp(true);
         } else if (event.altKey && (event.key === "s" || event.key === "S")) {
-          console.log("fdljknfj");
           setCsvCurrentData((prevData) => ({
             ...prevData,
           }));
@@ -185,11 +197,22 @@ const DataMatching = () => {
               imageRef.current.style.transformOrigin = "initial";
             }
           } else {
-            onImageHandler("next", currentIndex, csvData, currentTaskData);
-            setCurrentImageIndex(0);
+            if (isCurrentDataCurrect(csvCurrentData)) {
+              onImageHandler("next", currentIndex, csvData, currentTaskData);
+              setCurrentImageIndex(0);
+            }
           }
+        } else if (event.shiftKey && event.key === "+") {
+          zoomInHandler();
+          setSelectedCoordinates(true);
+        } else if (event.shiftKey && event.key === "-") {
+          zoomOutHandler();
+          setSelectedCoordinates(true);
+        } else if (event.shiftKey && (event.key === "I" || event.key === "i")) {
+          onInialImageHandler();
         }
       };
+
       window.addEventListener("keydown", handleKeyDown);
       return () => {
         window.removeEventListener("keydown", handleKeyDown);
@@ -400,6 +423,7 @@ const DataMatching = () => {
         const [start, end] = templateHeaders?.typeOption?.split("-");
 
         // Check if newValue is a single character or empty string
+        newValue = newValue.trim();
         if (newValue.length !== 1 && newValue !== "") {
           // If newValue is neither a single character nor empty string, return previous data
           return prevData;
@@ -555,9 +579,19 @@ const DataMatching = () => {
       toast.warning("Please enter the number of blanks.");
       return;
     }
+
+    if (multChecked && !pattern) {
+      toast.warning(
+        "Please enter a valid pattern following set:( /, -, *, ~, >.)"
+      );
+
+      return;
+    }
+
     setLoading(true);
     const conditions = {
       Blank: blankChecked ? Number(blankCount) : 0,
+      Pattern: pattern,
       "*": multChecked,
       AllData: allDataChecked,
     };
@@ -628,7 +662,7 @@ const DataMatching = () => {
       setPopUp(false);
     } catch (error) {
       setLoading(false);
-      toast.error(error.message);
+      toast.error(error?.response?.data?.error);
     }
   };
 
@@ -696,394 +730,28 @@ const DataMatching = () => {
             {popUp && (
               <>
                 {startModal ? (
-                  <div className="h-[100vh] flex justify-center bg-gradient-to-r from-blue-700 to-purple-700  items-center templatemapping pt-20">
-                    <div className="">
-                      {/* MAIN SECTION  */}
-                      <section className="mx-auto max-w-4xl  px-12 py-10 bg-white rounded-xl w-[100vw]">
-                        <div className="flex flex-col space-y-4  md:flex-row md:items-center md:justify-between md:space-y-0">
-                          <div>
-                            <h2 className="text-3xl font-semibold">
-                              Assigned Tasks
-                            </h2>
-                          </div>
-                        </div>
-                        <div className="mt-6 flex flex-col">
-                          <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                            <div className="inline-block  py-2 align-middle md:px-6 ">
-                              <div className=" border border-gray-200 md:rounded-lg">
-                                <div className="divide-y divide-gray-200 ">
-                                  <div className="bg-gray-50 w-full">
-                                    <div className="flex">
-                                      <div className=" py-3.5 px-4 text-center text-xl font-semibold text-gray-700 w-[150px]">
-                                        <span>Templates</span>
-                                      </div>
-
-                                      <div className=" py-3.5 px-4 text-center  text-xl font-semibold text-gray-700 w-[100px]">
-                                        Min
-                                      </div>
-
-                                      <div className=" py-3.5 px-4 text-center text-xl font-semibold text-gray-700 w-[100px]">
-                                        Max
-                                      </div>
-                                      <div className=" py-3.5 px-4 text-center text-xl font-semibold text-gray-700 w-[150px]">
-                                        Module
-                                      </div>
-                                      <div className=" py-3.5 px-4 text-center text-xl font-semibold text-gray-700 w-[150px]">
-                                        Status
-                                      </div>
-                                      <div className=" px-4 py-3.5 text-center text-xl font-semibold text-gray-700 w-[150px]">
-                                        Start Task
-                                      </div>
-                                    </div>
-                                  </div>
-                                  <div className="divide-y divide-gray-200 bg-white overflow-y-auto max-h-[300px]">
-                                    {allTasks?.map((taskData, index) => (
-                                      <>
-                                        <div
-                                          key={taskData.id}
-                                          className="flex  py-2 w-full"
-                                        >
-                                          <div className="whitespace-nowrap w-[150px] px-4">
-                                            <div className="text-md text-center">
-                                              {taskData.templateName}
-                                            </div>
-                                          </div>
-                                          <div className="whitespace-nowrap w-[100px] px-4">
-                                            <div className="text-md text-center">
-                                              {taskData.min}
-                                            </div>
-                                          </div>
-                                          <div className="whitespace-nowrap w-[100px] px-4">
-                                            <div className="text-md text-center">
-                                              {taskData.max}
-                                            </div>
-                                          </div>
-
-                                          <div className="whitespace-nowrap w-[150px] px-4">
-                                            <div className="text-md text-center font-semibold py-1 border-2">
-                                              {taskData.moduleType}
-                                            </div>
-                                          </div>
-
-                                          <div className="whitespace-nowrap w-[150px] px-4">
-                                            <div className="text-md text-center">
-                                              <span
-                                                className={`inline-flex items-center justify-center rounded-full ${
-                                                  !taskData.blankTaskStatus ||
-                                                  !taskData.multTaskStatus
-                                                    ? "bg-amber-100 text-amber-700"
-                                                    : "bg-emerald-100 text-emerald-700"
-                                                } px-2.5 py-0.5 `}
-                                              >
-                                                {!taskData.blankTaskStatus ||
-                                                !taskData.multTaskStatus ? (
-                                                  <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    strokeWidth="1.5"
-                                                    stroke="currentColor"
-                                                    className="-ms-1 me-1.5 h-4 w-4"
-                                                  >
-                                                    <path
-                                                      strokeLinecap="round"
-                                                      strokeLinejoin="round"
-                                                      d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                                                    />
-                                                  </svg>
-                                                ) : (
-                                                  <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    strokeWidth="1.5"
-                                                    stroke="currentColor"
-                                                    className="-ms-1 me-1.5 h-4 w-4"
-                                                  >
-                                                    <path
-                                                      strokeLinecap="round"
-                                                      strokeLinejoin="round"
-                                                      d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                    />
-                                                  </svg>
-                                                )}
-                                                <p className="whitespace-nowrap text-sm">
-                                                  {taskData.blankTaskStatus &&
-                                                  taskData.multTaskStatus
-                                                    ? "Completed"
-                                                    : "Pending"}
-                                                </p>
-                                              </span>
-                                            </div>
-                                          </div>
-                                          <div className="whitespace-nowrap text-center w-[150px] px-4">
-                                            <button
-                                              onClick={() =>
-                                                onDataTypeSelectHandler(
-                                                  taskData
-                                                )
-                                              }
-                                              className="rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white"
-                                            >
-                                              Start
-                                            </button>
-                                          </div>
-                                        </div>
-                                      </>
-                                    ))}
-                                    {compareTask?.map((taskData, index) => (
-                                      <div
-                                        key={taskData.id}
-                                        className="grid grid-cols-7 gap-x-6 py-2"
-                                      >
-                                        <div className="whitespace-nowrap w-1/6">
-                                          <div className="text-md text-center">
-                                            {taskData.templateName}
-                                          </div>
-                                        </div>
-                                        <div className="whitespace-nowrap  w-1/6">
-                                          <div className="text-md text-center">
-                                            {taskData.min}
-                                          </div>
-                                        </div>
-                                        <div className="whitespace-nowrap w-1/6">
-                                          <div className="text-md text-center">
-                                            {taskData.max}
-                                          </div>
-                                        </div>
-
-                                        <div className="whitespace-nowrap w-1/6">
-                                          <div className="text-md text-center font-semibold py-1 border-2">
-                                            {taskData.moduleType}
-                                          </div>
-                                        </div>
-
-                                        <div className="whitespace-nowrap w-1/6">
-                                          <div className="text-md text-center">
-                                            <span
-                                              className={`inline-flex items-center justify-center rounded-full ${
-                                                !taskData.taskStatus
-                                                  ? "bg-amber-100 text-amber-700"
-                                                  : "bg-emerald-100 text-emerald-700"
-                                              } px-2.5 py-0.5 `}
-                                            >
-                                              {!taskData.taskStatus ? (
-                                                <svg
-                                                  xmlns="http://www.w3.org/2000/svg"
-                                                  fill="none"
-                                                  viewBox="0 0 24 24"
-                                                  strokeWidth="1.5"
-                                                  stroke="currentColor"
-                                                  className="-ms-1 me-1.5 h-4 w-4"
-                                                >
-                                                  <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-                                                  />
-                                                </svg>
-                                              ) : (
-                                                <svg
-                                                  xmlns="http://www.w3.org/2000/svg"
-                                                  fill="none"
-                                                  viewBox="0 0 24 24"
-                                                  strokeWidth="1.5"
-                                                  stroke="currentColor"
-                                                  className="-ms-1 me-1.5 h-4 w-4"
-                                                >
-                                                  <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                                  />
-                                                </svg>
-                                              )}
-
-                                              <p className="whitespace-nowrap text-sm">
-                                                {taskData.taskStatus
-                                                  ? "Completed"
-                                                  : "Pending"}
-                                              </p>
-                                            </span>
-                                          </div>
-                                        </div>
-                                        <div className="whitespace-nowrap text-center w-1/6">
-                                          <button
-                                            onClick={() =>
-                                              onCompareTaskStartHandler(
-                                                taskData
-                                              )
-                                            }
-                                            className="rounded border border-indigo-500 bg-indigo-500 px-10 py-1 font-semibold text-white"
-                                          >
-                                            Start
-                                          </button>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </section>
-                    </div>
-                  </div>
+                  <UserTaskAssined
+                    onCompareTaskStartHandler={onCompareTaskStartHandler}
+                    allTasks={allTasks}
+                    onDataTypeSelectHandler={onDataTypeSelectHandler}
+                    compareTask={compareTask}
+                  />
                 ) : (
                   <>
-                    <div className="fixed z-10 inset-0 overflow-y-auto ">
-                      <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div
-                          className="fixed inset-0 transition-opacity"
-                          aria-hidden="true"
-                        >
-                          <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-                        </div>
-                        <span
-                          className="hidden sm:inline-block sm:align-middle sm:h-screen"
-                          aria-hidden="true"
-                        >
-                          &#8203;
-                        </span>
-                        <div className=" inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                          <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                            <div className="sm:flex sm:items-start">
-                              <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h1 className="text-xl font-bold text-gray-500 mb-6">
-                                  Please select the options
-                                </h1>
-                                <div className="text-gray-600 font-semibold my-2 overflow-y-auto h-[200px]">
-                                  <fieldset>
-                                    <legend className="sr-only">Options</legend>
-                                    <div className="divide-y divide-gray-200">
-                                      <label
-                                        htmlFor="blank"
-                                        className="flex cursor-pointer items-start gap-4 py-4"
-                                      >
-                                        <div className="flex items-center">
-                                          &#8203;
-                                          <input
-                                            type="checkbox"
-                                            className="size-4 rounded border-gray-300"
-                                            id="blank"
-                                            checked={blankChecked}
-                                            onChange={() =>
-                                              handleCheckboxChange("blank")
-                                            }
-                                          />
-                                        </div>
-                                        <div className="flex justify-between w-[100%]">
-                                          <strong className="font-medium text-gray-900">
-                                            Blank
-                                          </strong>
-
-                                          {blankChecked && (
-                                            <label
-                                              for="countNumber"
-                                              class="relative block overflow-hidden rounded-md border border-gray-200 px-2 pt-3 shadow-sm focus-within:border-blue-600 focus-within:ring-1 focus-within:ring-blue-600"
-                                            >
-                                              <input
-                                                type="number"
-                                                required
-                                                value={blankCount}
-                                                onChange={(e) =>
-                                                  setBlackCount(e.target.value)
-                                                }
-                                                id="countNumber"
-                                                class="peer h-6 w-full border-none bg-transparent  placeholder-transparent focus:border-transparent focus:outline-none focus:ring-0 sm:text-sm"
-                                              />
-                                            </label>
-                                          )}
-                                        </div>
-                                      </label>
-
-                                      <label
-                                        htmlFor="mult"
-                                        className="flex cursor-pointer items-start gap-4 py-4"
-                                      >
-                                        <div className="flex items-center">
-                                          &#8203;
-                                          <input
-                                            type="checkbox"
-                                            className="size-4 rounded border-gray-300"
-                                            id="mult"
-                                            checked={multChecked}
-                                            onChange={() =>
-                                              handleCheckboxChange("mult")
-                                            }
-                                          />
-                                        </div>
-                                        <div>
-                                          <strong className="font-medium text-gray-900">
-                                            Mult (*)
-                                          </strong>
-                                        </div>
-                                      </label>
-
-                                      {!blankChecked && !multChecked && (
-                                        <label
-                                          htmlFor="allData"
-                                          className="flex cursor-pointer items-start gap-4 py-4"
-                                        >
-                                          <div className="flex items-center">
-                                            &#8203;
-                                            <input
-                                              type="checkbox"
-                                              className="size-4 rounded border-gray-300"
-                                              id="allData"
-                                              checked={allDataChecked}
-                                              onChange={() =>
-                                                handleCheckboxChange("allData")
-                                              }
-                                            />
-                                          </div>
-                                          <div>
-                                            <strong className="font-medium text-gray-900">
-                                              All Data
-                                            </strong>
-                                          </div>
-                                        </label>
-                                      )}
-                                    </div>
-                                  </fieldset>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <button
-                              onClick={() =>
-                                onTaskStartHandler(currentTaskData)
-                              }
-                              type="button"
-                              disabled={loading ? true : false}
-                              className={`my-3 ml-3 w-full sm:w-auto inline-flex justify-center rounded-xl border border-transparent px-4 py-2 bg-teal-600 text-base leading-6 font-semibold text-white shadow-sm hover:bg-teal-500 focus:outline-none focus:border-teal-700 focus:shadow-outline-teal transition ease-in-out duration-150 sm:text-sm sm:leading-5 ${
-                                loading ? "opacity-50 cursor-not-allowed" : ""
-                              }`}
-                            >
-                              {loading ? (
-                                <div className="flex items-center justify-center">
-                                  <span className="mr-2">Loading...</span>
-                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                </div>
-                              ) : (
-                                "Confirm"
-                              )}
-                            </button>
-
-                            <button
-                              onClick={() => setStartModal(true)}
-                              type="button"
-                              className=" my-3 w-full sm:w-auto inline-flex justify-center rounded-xl
-               border border-transparent px-4 py-2 bg-gray-300 text-base leading-6 font-semibold text-gray-700 shadow-sm hover:bg-gray-400 focus:outline-none focus:border-gray-600 focus:shadow-outline-gray transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <DataOption
+                      blankChecked={blankChecked}
+                      handleCheckboxChange={handleCheckboxChange}
+                      blankCount={blankCount}
+                      pattern={pattern}
+                      setBlackCount={setBlackCount}
+                      setPattern={setPattern}
+                      multChecked={multChecked}
+                      allDataChecked={allDataChecked}
+                      onTaskStartHandler={onTaskStartHandler}
+                      currentTaskData={currentTaskData}
+                      loading={loading}
+                      setStartModal={setStartModal}
+                    />
                   </>
                 )}
               </>
@@ -1091,73 +759,18 @@ const DataMatching = () => {
             {!popUp && (
               <div className=" flex flex-col lg:flex-row  bg-gradient-to-r from-blue-600 to-purple-700 dataEntry pt-20">
                 {/* LEFT SECTION */}
-                <div className=" border-e lg:w-3/12 xl:w-[20%] order-lg-1 ">
-                  <div className="overflow-hidden w-[100%] ">
-                    <article
-                      style={{ scrollbarWidth: "thin" }}
-                      className="py-10 mt-5 lg:mt-16 shadow transition  hover:shadow-lg mx-auto overflow-y-auto lg:h-[80vh] rounded-lg flex flex-row lg:flex-col lg:items-center w-[95%] bg-blue-500"
-                    >
-                      {csvCurrentData &&
-                        Object.entries({ ...csvData[0] }).map(
-                          ([key, value], i) => {
-                            const templateData =
-                              templateHeaders?.templetedata.find(
-                                (data) =>
-                                  data.attribute === value &&
-                                  data.fieldType === "formField"
-                              );
-                            if (key !== imageColName && templateData) {
-                              return (
-                                <div
-                                  key={i}
-                                  className="w-5/6 px-3 lg:px-0 py-1  overflow-x font-bold justify-center items-center"
-                                >
-                                  <label className=" w-full overflow-hidden  rounded-md  font-semibold  py-2 shadow-sm  ">
-                                    <span className="text-sm text-white font-bold flex">
-                                      {key?.toUpperCase()}
-                                    </span>
-                                  </label>
-                                  <input
-                                    type="text"
-                                    className={`mt-1 border-none p-2 focus:border-transparent text-center rounded-lg focus:outline-none focus:ring-0 sm:text-sm w-48
-                                      ${
-                                        csvCurrentData[key] === "" ||
-                                        (csvCurrentData[key] &&
-                                          typeof csvCurrentData[key] ===
-                                            "string" &&
-                                          (csvCurrentData[key].includes("*") ||
-                                            csvCurrentData[key].includes(" ")))
-                                          ? "bg-red-500 text-white"
-                                          : "bg-white"
-                                      }
+                <FormDataSection
+                  csvCurrentData={csvCurrentData}
+                  csvData={csvData}
+                  templateHeaders={templateHeaders}
+                  imageColName={imageColName}
+                  currentFocusIndex={currentFocusIndex}
+                  inputRefs={inputRefs}
+                  handleKeyDownJump={handleKeyDownJump}
+                  changeCurrentCsvDataHandler={changeCurrentCsvDataHandler}
+                  imageFocusHandler={imageFocusHandler}
+                />
 
-                                      ${
-                                        i === currentFocusIndex
-                                          ? "bg-yellow-300"
-                                          : ""
-                                      }
-                                      `}
-                                    ref={(el) => (inputRefs.current[i] = el)}
-                                    value={csvCurrentData[key] || ""}
-                                    onKeyDown={(e) => handleKeyDownJump(e, i)}
-                                    onChange={(e) =>
-                                      changeCurrentCsvDataHandler(
-                                        key,
-                                        e.target.value
-                                      )
-                                    }
-                                    onFocus={() => imageFocusHandler(key)}
-                                  />
-                                </div>
-                              );
-                            }
-                          }
-                        )}
-                    </article>
-                  </div>
-
-                  {/* View image */}
-                </div>
                 {/* RIGHT SECTION */}
                 <div className="w-full lg:w-[80%] xl:w-10/12 matchingMain">
                   {imageUrls.length === 0 ? (
@@ -1231,173 +844,38 @@ const DataMatching = () => {
                           )}
                         </div>
                       </div>
-                      <div className="flex justify-between">
-                        <h3 className="ms-5 text-lg font-semibold py-3 text-white">
-                          Data No : {currentIndex} out of {csvData.length - 1}
-                        </h3>
-                        <div className="flex justify-center my-3">
-                          <button
-                            onClick={zoomInHandler}
-                            className="px-6 py-2 bg-blue-400 text-white rounded-3xl mx-2 hover:bg-blue-500"
-                          >
-                            Zoom In
-                          </button>
+                      <ButtonSection
+                        currentIndex={currentIndex}
+                        csvData={csvData}
+                        zoomInHandler={zoomInHandler}
+                        onInialImageHandler={onInialImageHandler}
+                        zoomOutHandler={zoomOutHandler}
+                        currentImageIndex={currentImageIndex}
+                        imageUrls={imageUrls}
+                      />
 
-                          <button
-                            onClick={onInialImageHandler}
-                            className="px-6 py-2 bg-blue-400 text-white rounded-3xl mx-2 hover:bg-blue-500"
-                          >
-                            Initial
-                          </button>
-                          <button
-                            onClick={zoomOutHandler}
-                            className="px-6 py-2 bg-blue-400 text-white rounded-3xl mx-2 hover:bg-blue-500"
-                          >
-                            Zoom Out
-                          </button>
-                        </div>
-                        <h3 className=" text-lg font-semibold py-3 text-white">
-                          {" "}
-                          Image : {currentImageIndex + 1} Out of{" "}
-                          {imageUrls.length}
-                        </h3>
-                      </div>
-
-                      <div
-                        ref={imageContainerRef}
-                        className="mx-auto bg-white"
-                        style={{
-                          position: "relative",
-                          border: "2px solid gray",
-                          width: "48rem",
-                          height: "23rem",
-                          overflow: "auto",
-                          scrollbarWidth: "thin",
-                        }}
-                      >
-                        <img
-                          src={`data:image/jpeg;base64,${imageUrls[currentImageIndex]?.base64Image}`}
-                          alt="Selected"
-                          ref={imageRef}
-                          style={{
-                            width: "48rem",
-                            transform: `scale(${zoomLevel})`,
-                            transformOrigin: "center center",
-                          }}
-                          draggable={false}
-                        />
-
-                        {!selectedCoordintes &&
-                          templateHeaders?.templetedata?.map(
-                            (data, index) =>
-                              data.pageNo === currentImageIndex && (
-                                <div
-                                  key={index}
-                                  style={{
-                                    border: "3px solid #007bff",
-                                    position: "absolute",
-                                    backgroundColor: "rgba(0, 123, 255, 0.2)",
-                                    left: `${data.coordinateX}px`,
-                                    top: `${data.coordinateY}px`,
-                                    width: `${data.width}px`,
-                                    height: `${data.height}px`,
-                                    transform: `scale(${zoomLevel})`,
-                                    transformOrigin: "center center",
-                                  }}
-                                ></div>
-                              )
-                          )}
-                      </div>
-                      <div className="w-full xl:w-2/3 xl:px-6 mx-auto text-white">
-                        <div className="my-4 w-full ">
-                          <label
-                            className="text-xl font-semibold ms-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            htmlFor="questions"
-                          >
-                            Questions:
-                          </label>
-                          <div
-                            className="flex overflow-auto max-h-[360px] mt-3 ms-2 xl:ms-2"
-                            style={{ scrollbarWidth: "thin" }}
-                          >
-                            <div className="flex flex-wrap">
-                              {csvCurrentData &&
-                                Object.entries(csvCurrentData).map(
-                                  ([key, value], i) => {
-                                    const csvHeader = csvData[0][key];
-                                    const templateData =
-                                      templateHeaders?.templetedata.find(
-                                        (data) => data.attribute === csvHeader
-                                      );
-                                    if (
-                                      templateData &&
-                                      templateData.fieldType ===
-                                        "questionsField" &&
-                                      key !== imageColName
-                                    ) {
-                                      return (
-                                        <div
-                                          key={i}
-                                          className=" me-3 my-1 flex"
-                                        >
-                                          <label
-                                            htmlFor={`Quantity${i}`}
-                                            className="font-bold text-sm w-9 text-bold my-1"
-                                          >
-                                            {key}
-                                          </label>
-                                          <div className="flex rounded">
-                                            <input
-                                              type="text"
-                                              id={`Quantity${i}`}
-                                              className={`h-7 w-7 text-center text-black rounded text-sm ${
-                                                csvCurrentData[key] === "" ||
-                                                (csvCurrentData[key] &&
-                                                  typeof csvCurrentData[key] ===
-                                                    "string" &&
-                                                  (csvCurrentData[key].includes(
-                                                    "*"
-                                                  ) ||
-                                                    csvCurrentData[
-                                                      key
-                                                    ].includes(" ")))
-                                                  ? "bg-red-500 text-white"
-                                                  : "bg-white"
-                                              }
-                                                  ${
-                                                    i === currentFocusIndex
-                                                      ? "bg-yellow-300 text-white"
-                                                      : ""
-                                                  }
-                                              `}
-                                              ref={(el) =>
-                                                (inputRefs.current[i] = el)
-                                              }
-                                              value={csvCurrentData[key] || ""}
-                                              onKeyDown={(e) =>
-                                                handleKeyDownJump(e, i)
-                                              }
-                                              placeholder={value}
-                                              onChange={(e) =>
-                                                changeCurrentCsvDataHandler(
-                                                  key,
-                                                  e.target.value
-                                                )
-                                              }
-                                              onFocus={() =>
-                                                imageFocusHandler(key)
-                                              }
-                                            />
-                                          </div>
-                                        </div>
-                                      );
-                                    }
-                                  }
-                                )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <ImageSection
+                        imageContainerRef={imageContainerRef}
+                        currentImageIndex={currentImageIndex}
+                        imageUrls={imageUrls}
+                        imageRef={imageRef}
+                        zoomLevel={zoomLevel}
+                        selectedCoordintes={selectedCoordintes}
+                        templateHeaders={templateHeaders}
+                      />
+                      <QuestionsDataSection
+                        csvCurrentData={csvCurrentData}
+                        csvData={csvData}
+                        templateHeaders={templateHeaders}
+                        imageColName={imageColName}
+                        currentFocusIndex={currentFocusIndex}
+                        inputRefs={inputRefs}
+                        handleKeyDownJump={handleKeyDownJump}
+                        changeCurrentCsvDataHandler={
+                          changeCurrentCsvDataHandler
+                        }
+                        imageFocusHandler={imageFocusHandler}
+                      />
                     </div>
                   )}
                 </div>

@@ -65,6 +65,9 @@ const ImageScanner = () => {
                 fieldType: data.fieldType,
                 fId: index,
                 attribute: data.attribute,
+                fieldRange: data.fieldRange,
+                fieldLength: data.fieldLength,
+                dataFieldType: data.dataFieldType,
               };
               return newObj;
             }
@@ -112,6 +115,10 @@ const ImageScanner = () => {
       prevIndex > 0 ? prevIndex - 1 : prevIndex
     );
   };
+
+  console.log(dataContext.templateData);
+
+  console.log(selectedCoordinateData);
 
   // Function to handle mouse down event for drag selection
   const handleMouseDown = (e) => {

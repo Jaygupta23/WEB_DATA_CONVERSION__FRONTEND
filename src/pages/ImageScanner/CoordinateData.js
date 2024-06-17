@@ -1,11 +1,8 @@
-import React, { Fragment } from "react";
-import { Dialog, Transition } from "@headlessui/react";
-import { RxCross1 } from "react-icons/rx";
+import React from "react";
 
 const CoordinateData = ({
   onSelectedHandler,
   open,
-  setOpen,
   onResetHandler,
   fieldType,
   setFieldType,
