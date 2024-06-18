@@ -12,6 +12,7 @@ import TemplateData from "./TemplateData";
 import CoordinateData from "./CoordinateData";
 import OptionData from "./OptionData";
 import DynamicInput from "./DynamicInput";
+import ConfirmationTemplateSave from "./ConfirmationTemplateSave";
 
 const ImageScanner = () => {
   const [selection, setSelection] = useState(null);
@@ -23,9 +24,10 @@ const ImageScanner = () => {
   const [removeModal, setRemoveModal] = useState(false);
   const [removeId, setRemoveId] = useState("");
   const [selectType, setSelectType] = useState("");
-  const [inputCount, setInputCount] = useState(0);
+  const [inputCount, setInputCount] = useState(4);
   const [inputValues, setInputValues] = useState([]);
   const [lengthOfField, setLengthOfField] = useState("");
+  const [confirmationModal, setConfirmationModal] = useState(false);
   const [open, setOpen] = useState(false);
   const [optionModel, setOptionModel] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -115,10 +117,6 @@ const ImageScanner = () => {
       prevIndex > 0 ? prevIndex - 1 : prevIndex
     );
   };
-
-  console.log(dataContext.templateData);
-
-  console.log(selectedCoordinateData);
 
   // Function to handle mouse down event for drag selection
   const handleMouseDown = (e) => {
@@ -303,12 +301,12 @@ const ImageScanner = () => {
       return;
     }
 
-    if (!selectedRow) {
+    if (optionModel && !selectedRow) {
       toast.warning("Please select the field options.");
       return;
     }
 
-    if (inputValues.length <= 0) {
+    if (optionModel && inputValues.length <= 0) {
       toast.warning("Please create input boxes.");
       return;
     }
@@ -502,8 +500,6 @@ const ImageScanner = () => {
     setOpen(true);
   };
 
-  console.log(selectedCoordinateData);
-
   return (
     <div className="flex flex-col-reverse lg:flex-row justify-center items-center scannerbg bg-gradient-to-r from-blue-700 to-purple-800 border-1 pt-20 ">
       {/* LEFT SECTION  */}
@@ -517,6 +513,7 @@ const ImageScanner = () => {
             onEditCoordinateDataHanlder={onEditCoordinateDataHanlder}
             setTemplateData={setTemplateData}
             setOptionModel={setOptionModel}
+            setConfirmationModal={setConfirmationModal}
           />
         </div>
       </div>
@@ -526,6 +523,13 @@ const ImageScanner = () => {
         onRemoveSelectedHandler={onRemoveSelectedHandler}
         removeModal={removeModal}
         setRemoveModal={setRemoveModal}
+      />
+
+      {/* Confirmation template saving COMPONENT  */}
+      <ConfirmationTemplateSave
+        onSubmitHandler={onSubmitHandler}
+        confirmationModal={confirmationModal}
+        setConfirmationModal={setConfirmationModal}
       />
 
       {/* OPTION DATA MODEL AND FINAL SUBMIT */}

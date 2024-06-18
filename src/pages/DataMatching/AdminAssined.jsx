@@ -263,12 +263,12 @@ const AdminAssined = () => {
     }
   };
 
-  const onEditTaskHandler = async (userId) => {
+  const onEditTaskHandler = async (user) => {
     try {
       const token = JSON.parse(localStorage.getItem("userData"));
       await axios.post(
         `http://${REACT_APP_IP}:4000/edit/assigned/task`,
-        { assignedTaskId: taskEditId, userId: userId },
+        { assignedTaskId: taskEditId, userId: user.id },
         {
           headers: {
             token: token,
@@ -276,6 +276,20 @@ const AdminAssined = () => {
         }
       );
 
+      const updatedTasks = matchingTask.map((task) => {
+        if (task.userId === user.id && task.id === taskEditId) {
+          console.log(task.userName + " ---- > " + user.userName);
+          const taksDa = {
+            ...task,
+            userName: user.userName,
+          };
+          console.log(taksDa);
+          return taksDa;
+        }
+        return task;
+      });
+
+      setMatchingTask(updatedTasks);
       toast.success("Task updated successfully.");
       setTaskEditId("");
       setTaskEdit(false);
@@ -283,8 +297,6 @@ const AdminAssined = () => {
       console.log(err);
     }
   };
-
-  console.log(taskEditId);
 
   return (
     <div className="h-[100vh] flex justify-center items-center bg-gradient-to-r from-blue-700 to-purple-700 templatemapping pt-20">

@@ -38,9 +38,7 @@ const CoordinateData = ({
             <div className="sm:flex sm:items-start">
               <div className="mt-3 text-center sm:mt-0 sm:text-left">
                 <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
-                  {fieldType === "formField"
-                    ? "Add Form Field"
-                    : "Add Questions Field"}
+                  {fieldType === "formField" ? "Add  Field" : "Add  Field"}
                 </h3>
               </div>
               <div className="absolute top-0 right-0 pt-4 pr-4">

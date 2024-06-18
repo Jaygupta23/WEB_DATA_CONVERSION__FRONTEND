@@ -1,6 +1,7 @@
 import React from "react";
 import { MdDelete } from "react-icons/md";
 import { CiEdit } from "react-icons/ci";
+import { toast } from "react-toastify";
 
 const TemplateData = ({
   selectedCoordinates,
@@ -10,7 +11,23 @@ const TemplateData = ({
   setTemplateData,
   setOptionModel,
   onEditCoordinateDataHanlder,
+  setConfirmationModal,
 }) => {
+  const onCheckHandler = () => {
+    const isQuestionsField = selectedCoordinates.find(
+      (coordinate) => coordinate.fieldType === "questionsField"
+    );
+    if (selectedCoordinates.length === 0) {
+      toast.warning("Please create the coordinates.");
+    } else if (templateData.name === "") {
+      toast.warning("Please enter the template name.");
+    } else if (!isQuestionsField) {
+      setConfirmationModal(true);
+    } else {
+      setOptionModel(true);
+    }
+  };
+
   return (
     <div className="px-4 py-6">
       <div className="space-y-20">
@@ -80,8 +97,9 @@ const TemplateData = ({
                 }
                 placeholder="enter template name.."
               />
+              {console.log(selectedCoordinates)}
               <button
-                onClick={() => setOptionModel(true)}
+                onClick={onCheckHandler}
                 className="ms-auto group rounded-3xl  mt-6 flex items-center   bg-indigo-600 hover:shadow-lg hover:shadow-blue-200  py-2 px-4 transition-colors hover:bg-teal-700 focus:outline-none focus:ring"
               >
                 <span className="font-medium  flex text-white transition-colors group-hover:text-white  group-active:text-white mx-auto">

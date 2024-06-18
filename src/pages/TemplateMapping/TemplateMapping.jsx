@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { onGetTemplateHandler, REACT_APP_IP } from "../../services/common";
+import HeaderData from "./HeaderData";
+import HeaderMappedReview from "./HeaderMappedReview";
 
 const TemplateMapping = () => {
   const [csvHeaders, setCsvHeaders] = useState([]);
@@ -148,173 +150,20 @@ const TemplateMapping = () => {
     <div className=" min-h-[100vh] overflow-y overflow-x-auto flex justify-center bg-gradient-to-r from-blue-700 to-purple-800 items-center templatemapping pt-20 pb-12">
       <div className="w-[700px]">
         <h1 className="text-white text-4xl text-center mb-10">Mapping</h1>
-        <div>
-          <div className="flex w-full justify-around mb-4">
-            <div className="w-1/3 text-center">
-              <label className="block text-xl text-white font-semibold">
-                CSV Header
-              </label>
-            </div>
-            <div className="w-1/3 text-center">
-              <label className="block text-xl text-white font-semibold">
-                Template Header
-              </label>
-            </div>
-          </div>
-          <div className="h-[50vh] overflow-y-auto">
-            {csvHeaders &&
-              csvHeaders
-                .filter(
-                  (csvHeader) =>
-                    csvHeader !== "Previous Values" ||
-                    csvHeader !== "Updated Values" ||
-                    csvHeader !== "User Details" ||
-                    csvHeader !== "Updated Col. Name"
-                )
-                .map((csvHeader, index) => {
-                  if (
-                    csvHeader === "Previous Values" ||
-                    csvHeader === "Updated Values" ||
-                    csvHeader === "User Details" ||
-                    csvHeader === "Updated Col. Name"
-                  ) {
-                  } else {
-                    return (
-                      <div
-                        key={index}
-                        className="flex w-full justify-around mb-3"
-                      >
-                        <select
-                          className="block w-1/3 py-1 me-10 text-xl font-semibold text-center border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                          aria-label="CSV Header Name"
-                          onChange={(e) =>
-                            handleCsvHeaderChange(csvHeader, e.target.value)
-                          }
-                          value={csvHeader}
-                        >
-                          <option disabled defaultValue>
-                            Select CSV Header Name
-                          </option>
-                          {csvHeaders
-                            .filter(
-                              (csvData) =>
-                                csvData !== "User Details" &&
-                                csvData !== "Updated Details"
-                            )
-                            .map((csvData, idx) => (
-                              <option key={idx} value={csvData}>
-                                {csvData}
-                              </option>
-                            ))}
-                        </select>
-                        <select
-                          className="block w-1/3 py-1 ms-10 text-xl font-semibold text-center border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                          aria-label="Template Header"
-                          onChange={(e) =>
-                            handleTemplateHeaderChange(
-                              csvHeader,
-                              e.target.value
-                            )
-                          }
-                          value={
-                            selectedAssociations[csvHeader] || "UserFieldName"
-                          }
-                        >
-                          <option>UserFieldName</option>
-                          {templateHeaders &&
-                            templateHeaders.templetedata.map(
-                              (template, idx) => (
-                                <option key={idx} value={template.attribute}>
-                                  {template.attribute}
-                                </option>
-                              )
-                            )}
-                        </select>
-                      </div>
-                    );
-                  }
-                })}
-          </div>
-        </div>
+        <HeaderData
+          csvHeaders={csvHeaders}
+          handleTemplateHeaderChange={handleTemplateHeaderChange}
+          templateHeaders={templateHeaders}
+          selectedAssociations={selectedAssociations}
+          handleCsvHeaderChange={handleCsvHeaderChange}
+        />
 
-        <div className="text-center mt-5 pt-5">
-          <label
-            onClick={() => setShowModal(true)}
-            className="font-medium text-white bg-teal-600 rounded-3xl
-               shadow-md cursor-pointer select-none text-xl px-16 py-2 hover:shadow-xl active:shadow-md"
-          >
-            <span>Save</span>
-          </label>
-          {showModal && (
-            <div className="fixed z-10 inset-0 overflow-y-auto ">
-              <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div
-                  className="fixed inset-0 transition-opacity"
-                  aria-hidden="true"
-                >
-                  <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-                </div>
-                <span
-                  className="hidden sm:inline-block sm:align-middle sm:h-screen"
-                  aria-hidden="true"
-                >
-                  &#8203;
-                </span>
-                <div className=" inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md sm:w-full">
-                  <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div className="sm:flex sm:items-start">
-                      <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                        <h1 className="text-xl  font-bold text-gray-500 mb-6">
-                          Mapped Data..
-                        </h1>
-                        <div className="text-gray-600 font-semibold my-2 overflow-y-auto h-[300px]">
-                          <dl className="-my-3 divide-y divide-gray-100 text-sm">
-                            {Object.entries(selectedAssociations).map(
-                              ([csvHeader, templateHeader], index) => (
-                                <div
-                                  key={index}
-                                  className="grid grid-cols-1 gap-1 py-3 text-center even:bg-gray-50 sm:grid-cols-3 sm:gap-4"
-                                >
-                                  <dt className="font-medium text-md text-gray-700 text-center">
-                                    {csvHeader}
-                                  </dt>
-                                  <dd className="text-gray-700 font-medium sm:col-span-2 text-center">
-                                    {templateHeader}
-                                  </dd>
-                                </div>
-                              )
-                            )}
-                          </dl>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button
-                      onClick={() => {
-                        onMapSubmitHandler();
-                        setShowModal(false);
-                      }}
-                      type="button"
-                      className=" my-3 ml-3 w-full sm:w-auto inline-flex justify-center rounded-xl
-               border border-transparent px-4 py-2 bg-teal-600 text-base leading-6 font-semibold text-white shadow-sm hover:bg-teal-500 focus:outline-none focus:border-teal-700 focus:shadow-outline-teal transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-                    >
-                      Submit
-                    </button>
-                    <button
-                      onClick={() => setShowModal(false)}
-                      type="button"
-                      className=" my-3 w-full sm:w-auto inline-flex justify-center rounded-xl
-               border border-transparent px-4 py-2 bg-gray-300 text-base leading-6 font-semibold text-gray-700 shadow-sm hover:bg-gray-400 focus:outline-none focus:border-gray-600 focus:shadow-outline-gray transition ease-in-out duration-150 sm:text-sm sm:leading-5"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+        <HeaderMappedReview
+          onMapSubmitHandler={onMapSubmitHandler}
+          setShowModal={setShowModal}
+          showModal={showModal}
+          selectedAssociations={selectedAssociations}
+        />
       </div>
     </div>
   );

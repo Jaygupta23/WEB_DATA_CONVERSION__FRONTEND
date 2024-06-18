@@ -147,7 +147,7 @@ const DataMatching = () => {
         return newCsvData;
       });
       onImageHandler("next", currentIndex, csvData, currentTaskData);
-      toast.success("Data updated successfully.");
+      toast.success(`Data updated successfully .`);
     } catch (error) {
       console.error("API error:", error);
       toast.error(error.message);
@@ -184,7 +184,7 @@ const DataMatching = () => {
               imageRef.current.style.transformOrigin = "initial";
             }
           } else {
-            onImageHandler("prev", currentIndex, csvData, currentTaskData);
+            // onImageHandler("prev", currentIndex, csvData, currentTaskData);
             setCurrentImageIndex(0);
           }
         } else if (event.key === "ArrowRight" || event.key === "PageDown") {
@@ -197,10 +197,8 @@ const DataMatching = () => {
               imageRef.current.style.transformOrigin = "initial";
             }
           } else {
-            if (isCurrentDataCurrect(csvCurrentData)) {
-              onImageHandler("next", currentIndex, csvData, currentTaskData);
-              setCurrentImageIndex(0);
-            }
+            // onImageHandler("next", currentIndex, csvData, currentTaskData);
+            setCurrentImageIndex(0);
           }
         } else if (event.shiftKey && event.key === "+") {
           zoomInHandler();
@@ -210,6 +208,8 @@ const DataMatching = () => {
           setSelectedCoordinates(true);
         } else if (event.shiftKey && (event.key === "I" || event.key === "i")) {
           onInialImageHandler();
+        } else if (event.shiftKey && (event.key === "p" || event.key === "P")) {
+          onImageHandler("prev", currentIndex, csvData, currentTaskData);
         }
       };
 
@@ -359,44 +359,6 @@ const DataMatching = () => {
     }
   };
 
-  // const changeCurrentCsvDataHandler = (key, value) => {
-  //   if (!imageNotFound) {
-  //     return;
-  //   }
-
-  //   setCsvCurrentData((prevData) => ({
-  //     ...prevData,
-  //     [key]: value,
-  //   }));
-
-  //   setModifiedKeys((prevKeys) => {
-  //     return {
-  //       ...prevKeys,
-  //       [key]: true,
-  //     };
-  //   });
-  // };
-
-  // Updating the input field
-  // const changeCurrentCsvDataHandler = (key, value) => {
-  //   if (!imageNotFound) {
-  //     return;
-  //   }
-
-  //   setCsvCurrentData((prevData) => ({
-  //     ...prevData,
-  //     [key]: value,
-  //   }));
-
-  //   setModifiedKeys((prevKeys) => {
-  //     return {
-  //       ...prevKeys,
-  //       [key]: true,
-  //     };
-  //   });
-  // };
-
-  // Updating the input field
   const changeCurrentCsvDataHandler = (key, newValue) => {
     if (!imageNotFound) {
       return;
@@ -418,50 +380,28 @@ const DataMatching = () => {
     setCsvCurrentData((prevData) => {
       const previousValue = prevData[key];
 
-      // Check if matchedCoordinate.fieldType is "questionsField"
       if (matchedCoordinate?.fieldType === "questionsField") {
-        const [start, end] = templateHeaders?.typeOption?.split("-");
-
-        // Check if newValue is a single character or empty string
+        const validCharacters = templateHeaders?.typeOption?.split("-");
         newValue = newValue.trim();
         if (newValue.length !== 1 && newValue !== "") {
-          // If newValue is neither a single character nor empty string, return previous data
           return prevData;
         }
 
-        // Convert start and end to character codes
-        const charCodeStart = start.charCodeAt(0);
-        const charCodeEnd = end.charCodeAt(0);
-
-        // Convert newValue to character code
-        const charCodeNewValue = newValue.charCodeAt(0);
-
-        // Check if newValue falls within the range of start to end inclusively
-        if (
-          (charCodeNewValue >= charCodeStart &&
-            charCodeNewValue <= charCodeEnd) ||
-          newValue === ""
-        ) {
-          // Valid input or removal, proceed with updating data
-
-          // Update modified keys
+        // Check if newValue is in the list of valid characters or is an empty string
+        if (validCharacters.includes(newValue) || newValue === "") {
           setModifiedKeys((prevKeys) => ({
             ...prevKeys,
             [key]: [newValue, previousValue],
           }));
 
-          // Update CSV data
           return {
             ...prevData,
             [key]: newValue,
           };
         } else {
-          // Invalid input, return previous data
           return prevData;
         }
       } else {
-        // For non-"questionsField" fields, return previous data
-        // Update modified keys
         setModifiedKeys((prevKeys) => ({
           ...prevKeys,
           [key]: [newValue, previousValue],
@@ -474,7 +414,6 @@ const DataMatching = () => {
       }
     });
   };
-
   const imageFocusHandler = (headerName) => {
     const csvDataKeys = Object.keys(csvData[0]);
     let matchedValue = null;
