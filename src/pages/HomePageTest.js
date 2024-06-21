@@ -1,6 +1,5 @@
 import React from "react";
-// import UploadDataFile from "./uploadDataFile";
-import UploadDataFile from './../components/resultGeneration/uploadDataFile';
+import UploadDataFile from "./../components/resultGeneration/uploadDataFile";
 
 const HomePageTest = () => {
   return (

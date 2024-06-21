@@ -259,7 +259,13 @@ const DataMatching = () => {
       }
     }
   };
+  
 
+
+
+
+
+  
   // Api for getting the image from the backend
   const onImageHandler = async (
     direction,
