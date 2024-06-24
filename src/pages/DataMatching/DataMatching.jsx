@@ -809,11 +809,11 @@ const DataMatching = () => {
                         templateHeaders={templateHeaders}
                       />
                       <QuestionsDataSection
-                        csvCurrentData={csvCurrentData}
-                        csvData={csvData}
-                        templateHeaders={templateHeaders}
-                        imageColName={imageColName}
-                        currentFocusIndex={currentFocusIndex}
+                        csvCurrentData={csvCurrentData}   //whole row data 
+                        csvData={csvData}  //error questions data
+                        templateHeaders={templateHeaders} //template header already present
+                        imageColName={imageColName} 
+                        currentFocusIndex={currentFocusIndex}     
                         inputRefs={inputRefs}
                         handleKeyDownJump={handleKeyDownJump}
                         changeCurrentCsvDataHandler={

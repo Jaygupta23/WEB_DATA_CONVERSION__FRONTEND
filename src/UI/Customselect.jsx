@@ -18,7 +18,7 @@ const Customselect = (props) => {
       dataCtx.addToPrimaryKey(selectValue); //taking time to select option how can i improve ??
     }
   }, [selectValue]);
-
+  console.log(dataCtx.csvHeader);
   const arr = dataCtx.csvHeader.map((item, index) => {
     return (
       <MenuItem key={index} value={item}>
@@ -57,19 +57,34 @@ const Customselect = (props) => {
 
   return (
     <FormControl required sx={{ width: "100%" }}>
-      <InputLabel id="demo-simple-select-required-label">
+      <InputLabel
+        id="demo-simple-select-required-label"
+        sx={{ color: "white" }} // Set label text color to white
+      >
         {props.label}
       </InputLabel>
       <Select
         labelId="demo-simple-select-required-label"
         id="demo-simple-select-required"
-        // value={age}
         value={selectValue}
         label={`${props.label} *`}
         sx={{
           "& .MuiSelect-select": {
             backdropFilter: "blur(5px)",
             fontWeight: "500",
+            color: "white", // Ensure select text color is white
+          },
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: "white",
+          },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "blue",
+          },
+          "&.Mui-focused .MuiSelect-icon": {
+            color: "blue",
+          },
+          "& .MuiSelect-icon": {
+            color: "white",
           },
         }}
         MenuProps={{
@@ -78,7 +93,7 @@ const Customselect = (props) => {
           getcontentanchorel: null,
           PaperProps: {
             style: {
-              maxHeight: "350px", // Adjust the maximum height of the dropdown menu
+              maxHeight: "350px",
             },
           },
         }}
@@ -86,12 +101,14 @@ const Customselect = (props) => {
         // disabled={dataCtx.csvHeader.length === 0 ? true : false}
       >
         {dataCtx.csvHeader.length === 0 && (
-          <MenuItem value="">No Data present</MenuItem>
+          <MenuItem value="" sx={{ color: "white" }}>
+            No Data present
+          </MenuItem>
         )}
         {dataCtx.csvHeader.length !== 0 && arr}
       </Select>
-      {/* <select onChange={handleChange}>{arr}</select> */}
-      <FormHelperText>Required</FormHelperText>
+      <FormHelperText sx={{ color: "white" }}>Required</FormHelperText>{" "}
+      {/* Set helper text color to white */}
     </FormControl>
   );
 };

@@ -185,14 +185,14 @@ const Assignee = () => {
                           scope="col"
                           className="px-12 py-3.5 text-left  text-xl font-semibold text-gray-700"
                         >
-                          Min
+                          Start Primary
                         </th>
 
                         <th
                           scope="col"
                           className="px-12 py-3.5 text-left text-xl font-semibold text-gray-700"
                         >
-                          Max
+                          End Primary
                         </th>
                         <th
                           scope="col"

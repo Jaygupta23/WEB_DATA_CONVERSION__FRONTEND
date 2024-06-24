@@ -5,6 +5,7 @@ const initialData = {
   csvHeader: [],
   isLogin: localStorage.getItem("userData") ? true : false,
   primaryKey: "",
+  fileOneDataName: "",
   skippingKey: [],
   firstInputFileName: "",
   secondInputFileName: "",
@@ -180,11 +181,20 @@ const DataProvider = (props) => {
   };
 
   const modifyTemplateDataHandler = (templateData) => {
-    console.log("templateData saving" , templateData)
+    console.log("templateData saving", templateData);
     setDataState((item) => {
       return {
         ...item,
         templateData: templateData,
+      };
+    });
+  };
+  const setFileOneDataNameHandler = (dataName) => {
+    console.log("templateData saving", dataName);
+    setDataState((item) => {
+      return {
+        ...item,
+        fileOneDataName: dataName,
       };
     });
   };
@@ -194,6 +204,7 @@ const DataProvider = (props) => {
     loginData: dataState.loginData,
     csvHeader: dataState.csvHeader,
     primaryKey: dataState.primaryKey,
+    fileOneDataName: dataState.fileOneDataName,
     skippingKey: dataState.skippingKey,
     firstInputFileName: dataState.firstInputFileName,
     secondInputFileName: dataState.secondInputFileName,
@@ -230,6 +241,7 @@ const DataProvider = (props) => {
     setCsvDataWithImage: setCsvDataWithImageHandler,
     setUploadZipImage: setUploadZipImageHandler,
     setFormFeilds: setFormFeildsHandler,
+    setFileOneDataName: setFileOneDataNameHandler,
   };
 
   return (

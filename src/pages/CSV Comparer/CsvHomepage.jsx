@@ -1,6 +1,6 @@
 import Customselect from "../../UI/Customselect";
 import Input from "../../UI/Input";
-import { Fab, CircularProgress } from "@mui/material";
+import { Fab, CircularProgress, cardActionsClasses } from "@mui/material";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import OptimisedList from "../../UI/OptimisedList";
 import Button from "@mui/material/Button";
@@ -13,6 +13,8 @@ import { REACT_APP_IP } from "../../services/common";
 import LoadingButton from "@mui/lab/LoadingButton";
 import ModalWithLoadingBar from "../../UI/Modal";
 import MultList from "../../UI/MultList";
+
+import NewSelect from "../../UI/NewSelect";
 
 const CsvHomepage = () => {
   const [loading, setLoading] = useState(false);
@@ -106,17 +108,22 @@ const CsvHomepage = () => {
             },
           }
         );
+        console.log(response.status);
+
         console.log(response.data);
-        dataCtx.setCsvFile(response.data.data);
-        const modifiedRes = response.data.data.map((item) => {
-          return { ...item, corrected: "" };
-        });
-        dataCtx.addToCorrectedCsv(modifiedRes);
+        // dataCtx.setCsvFile(response.data.data);
+        // const modifiedRes = response.data.data.map((item) => {
+        //   return { ...item, corrected: "" };
+        // });
+        // dataCtx.addToCorrectedCsv(modifiedRes);
         setLoading(false);
-        navigate("/comparecsv/assign_operator", { state: response.data });
+
+        // navigate("/comparecsv/assign_operator", { state: response.data });
       } catch (err) {
-        alert("Error Occured : ", err);
-        console.log(err);
+        // alert("Error Occured : ", JSON.stringify(err.response.data.err));
+        const alertmsg = err.response.data.err;
+        alert(`Error Occured : ${alertmsg}`);
+        console.log(err.response.data.err);
       }
     };
     sendRequest();
@@ -124,17 +131,23 @@ const CsvHomepage = () => {
   return (
     <>
       <main
-        className={`flex flex-col gap-5 bg-white rounded-md ${classes.homepage}`}
+        className={`flex flex-col gap-5 bg-white rounded-md bg-gradient-to-r from-blue-700 to-purple-500 ${classes.homepage}`}
       >
         <div
           className={`flex flex-col border-dashed pt-24 px-5 rounded-md xl:w-5/6 justify-center self-center ${classes.innerBox}`}
         >
-          <h1 className="text-center mb-6 text-black-300 text-2xl font-bold">
+          <h1 className="text-center mb-6 text-white text-2xl font-bold">
             MATCH AND COMPARE DATA
           </h1>
           <div className="flex flex-row justify-between  gap-10 mb-6">
+            {/* <Customselect label="Select Template" />
+            <Customselect label="Select  Files" /> */}
+            <NewSelect label="Select Template" />
+            <NewSelect label="Select Files" />
+          </div>
+          <div className="flex flex-row justify-between  gap-10 mb-6">
             <Input label="Select Paper 1" state="first" type="text/csv" />
-            <Input label="Select Paper 2" state="second" type="text/csv" />
+            {/* <Input label="Select Paper 2" state="second" type="text/csv" /> */}
             <Input
               label="Select Image Zipfile"
               state="third"
@@ -190,20 +203,6 @@ const CsvHomepage = () => {
             progress={progress}
             message="Comparing and matching the files..."
           />
-          {/* <div className="flex justify-center m-10 gap-10">
-            <div >
-              <Fab variant="extended" color="primary" onClick={compareHandler}>
-                <CompareArrowsIcon sx={{ mr: 1 }} />
-                Find mult and blank
-              </Fab>
-            </div>
-            <div >
-              <Fab variant="extended" color="primary" onClick={compareHandler}>
-                <CompareArrowsIcon sx={{ mr: 1 }} />
-                Compare And Match
-              </Fab>
-            </div>
-          </div> */}
         </div>
       </main>
     </>

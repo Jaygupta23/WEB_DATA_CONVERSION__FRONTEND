@@ -5,6 +5,7 @@ const dataContext = React.createContext({
   isLoading: true,
   primaryKey: "",
   imageColName: "",
+  fileOneDataName: "",
   skippingKey: [],
   firstInputFileName: "",
   secondInputFileName: "",
@@ -41,6 +42,7 @@ const dataContext = React.createContext({
   setCsvDataWithImage: () => {},
   setUploadZipImage: () => {},
   setFormFeilds: () => {},
+  setFileOneDataName: () => {},
 });
 
 export default dataContext;
