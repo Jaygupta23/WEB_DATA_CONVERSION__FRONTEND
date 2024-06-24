@@ -23,6 +23,7 @@ import Assignee from "./pages/CSV Comparer/Assignee";
 import DuplicityDetect from "./pages/DuplicityDetect/DuplicityDetect";
 import UserDetail from "./pages/Admin/UserDetail";
 import UpdatedDetails from "./pages/Admin/UpdatedDetails";
+import FieldDecision from "./pages/FieldDecision/FieldDecision";
 
 function App() {
   const datactx = useContext(dataContext);
@@ -105,6 +106,10 @@ function App() {
                   <Route
                     path="/csvuploader/templatemap/:id"
                     element={<TemplateMapping />}
+                  />
+                  <Route
+                    path="/csvuploader/fieldDecision/:id"
+                    element={<FieldDecision />}
                   />
                   <Route
                     path="/csvuploader/taskAssign/:id"

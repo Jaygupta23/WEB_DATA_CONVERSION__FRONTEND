@@ -140,7 +140,7 @@ const TemplateMapping = () => {
         }
       );
       toast.success("Mapping successfully done.");
-      navigate(`/csvuploader/taskAssign/${id}`);
+      navigate(`/csvuploader/fieldDecision/${id}`);
     } catch (error) {
       toast.error(error.message);
     }
