@@ -7,12 +7,12 @@ import axios from "axios";
 import dataContext from "../../Store/DataContext";
 import { REACT_APP_IP } from "../../services/common";
 import RemoveTemplate from "./RemoveTemplate";
-
 import TemplateData from "./TemplateData";
 import CoordinateData from "./CoordinateData";
 import OptionData from "./OptionData";
 import DynamicInput from "./DynamicInput";
 import ConfirmationTemplateSave from "./ConfirmationTemplateSave";
+import SelectPattern from "./SelectPattern";
 
 const ImageScanner = () => {
   const [selection, setSelection] = useState(null);
@@ -33,6 +33,8 @@ const ImageScanner = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const dataCtx = useContext(dataContext);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [selectPattern, setSelectedPattern] = useState("");
+  const [patternModal, setPatternModal] = useState(false);
   const [selectedCoordinateData, setSelectedCoordinateData] = useState(null);
   const [templateData, setTemplateData] = useState({
     name: "",
@@ -78,7 +80,12 @@ const ImageScanner = () => {
             ...prevState,
             name: dataCtx?.templateData?.templateData?.name,
             pageCount: dataCtx?.templateData?.templateData?.pageCount,
+            patternDefinition:
+              dataCtx?.templateData?.templateData?.patternDefinition,
           }));
+          setSelectedPattern(
+            dataCtx?.templateData?.templateData?.patternDefinition
+          );
           setSelectedCoordinates(selectedCoordinatesData);
         }
       }
@@ -296,6 +303,12 @@ const ImageScanner = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+
+    if (!selectPattern) {
+      toast.error("Please select the pattern");
+      return;
+    }
+
     if (selectedCoordinates.length === 0) {
       toast.error("Please select the coordinates");
       return;
@@ -349,6 +362,7 @@ const ImageScanner = () => {
         name: templateData.name,
         pageCount: imageURL.length,
         typeOption: concatenatedString,
+        patternDefinition: selectPattern,
       },
       templateId: dataCtx?.templateData?.templateData?.id
         ? dataCtx?.templateData?.templateData?.id
@@ -382,6 +396,7 @@ const ImageScanner = () => {
       toast.success("Template created successfully!");
       dataCtx.modifyTemplateData(null);
       localStorage.removeItem("images");
+      setSelectedPattern("");
       navigate("/imageuploader");
     } catch (error) {
       console.log(error);
@@ -514,6 +529,8 @@ const ImageScanner = () => {
             setTemplateData={setTemplateData}
             setOptionModel={setOptionModel}
             setConfirmationModal={setConfirmationModal}
+            setPatternModal={setPatternModal}
+            selectPattern={selectPattern}
           />
         </div>
       </div>
@@ -532,6 +549,13 @@ const ImageScanner = () => {
         setConfirmationModal={setConfirmationModal}
       />
 
+      <SelectPattern
+        selectPattern={selectPattern}
+        setSelectedPattern={setSelectedPattern}
+        patternModal={patternModal}
+        setPatternModal={setPatternModal}
+      />
+
       {/* OPTION DATA MODEL AND FINAL SUBMIT */}
       <OptionData
         optionModel={optionModel}
@@ -543,6 +567,7 @@ const ImageScanner = () => {
         handleCreateInputs={handleCreateInputs}
         onSubmitHandler={onSubmitHandler}
       />
+
       {/* RIGHT SECTION  */}
       {!image ? (
         <div className="flex w-[75%] h-[100vh] justify-center items-center">

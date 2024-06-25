@@ -12,8 +12,16 @@ const TemplateData = ({
   setOptionModel,
   onEditCoordinateDataHanlder,
   setConfirmationModal,
+  setPatternModal,
+  selectPattern,
 }) => {
   const onCheckHandler = () => {
+    if (!selectPattern) {
+      setPatternModal(true);
+      toast.warning("Please select the pattern.");
+      return;
+    }
+
     const isQuestionsField = selectedCoordinates.find(
       (coordinate) => coordinate.fieldType === "questionsField"
     );
@@ -97,15 +105,24 @@ const TemplateData = ({
                 }
                 placeholder="enter template name.."
               />
-              {console.log(selectedCoordinates)}
-              <button
-                onClick={onCheckHandler}
-                className="ms-auto group rounded-3xl  mt-6 flex items-center   bg-indigo-600 hover:shadow-lg hover:shadow-blue-200  py-2 px-4 transition-colors hover:bg-teal-700 focus:outline-none focus:ring"
-              >
-                <span className="font-medium  flex text-white transition-colors group-hover:text-white  group-active:text-white mx-auto">
-                  Save Template
-                </span>
-              </button>
+              <div className="flex justify-around">
+                <button
+                  onClick={() => setPatternModal(true)}
+                  className="ms-auto group rounded  mt-6 flex items-center   bg-indigo-600 hover:shadow-lg hover:shadow-blue-200  py-2 px-4 transition-colors hover:bg-teal-700 focus:outline-none focus:ring"
+                >
+                  <span className="font-medium  flex text-white transition-colors group-hover:text-white  group-active:text-white mx-auto">
+                    Select Pattern
+                  </span>
+                </button>
+                <button
+                  onClick={onCheckHandler}
+                  className="ms-auto group rounded  mt-6 flex items-center   bg-teal-600 hover:shadow-lg hover:shadow-blue-200  py-2 px-4 transition-colors hover:bg-teal-700 focus:outline-none focus:ring"
+                >
+                  <span className="font-medium  flex text-white transition-colors group-hover:text-white  group-active:text-white mx-auto">
+                    Save Template
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

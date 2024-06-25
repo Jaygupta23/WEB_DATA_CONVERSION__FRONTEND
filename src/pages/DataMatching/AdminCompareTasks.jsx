@@ -95,11 +95,6 @@ const AdminCompareTasks = ({ compareTask, onCompareTaskStartHandler }) => {
               Edit
             </button>
           </div>
-          {/* <div className="whitespace-nowrap text-center w-[200px] py-2">
-            <button className="rounded border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white">
-              Remove
-            </button>
-          </div> */}
         </div>
       ))}
     </div>

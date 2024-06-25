@@ -1,4 +1,6 @@
 import React from "react";
+import { MdOutlineRestartAlt } from "react-icons/md";
+import { FaCloudDownloadAlt, FaRegEdit } from "react-icons/fa";
 
 const AdminMatchingTasks = ({
   onCompleteHandler,
@@ -11,24 +13,24 @@ const AdminMatchingTasks = ({
     <div>
       {matchingTask?.map((taskData) => (
         <div key={taskData.id} className="flex ">
-          <div className="whitespace-nowrap w-[150px] py-2">
+          <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-center text-md ">{taskData.templateName}</div>
           </div>
-          <div className="whitespace-nowrap w-[150px] py-2">
+          <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-center text-md">{taskData.userName}</div>
           </div>
-          <div className="whitespace-nowrap w-[80px] py-2">
+          <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-md text-center">{taskData.min}</div>
           </div>
-          <div className="whitespace-nowrap w-[80px] py-2">
+          <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-md text-center">{taskData.max}</div>
           </div>
-          <div className="whitespace-nowrap w-[150px] py-2">
-            <div className="text-md text-center font-semibold border-2 py-1">
+          <div className="whitespace-nowrap w-[100px] py-2">
+            <div className="text-md text-center border-2 ">
               {taskData.moduleType}
             </div>
           </div>
-          <div className="whitespace-nowrap w-[150px] py-2">
+          <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-md text-center">
               <span
                 className={`inline-flex items-center justify-center rounded-full ${
@@ -44,7 +46,7 @@ const AdminMatchingTasks = ({
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
                     stroke="currentColor"
-                    className="-ms-1 me-1.5 h-4 w-4"
+                    className="-ms-1 me-1.5 h-4 w-4 ml-2"
                   >
                     <path
                       strokeLinecap="round"
@@ -59,7 +61,7 @@ const AdminMatchingTasks = ({
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
                     stroke="currentColor"
-                    className="-ms-1 me-1.5 h-4 w-4"
+                    className="-ms-1 me-1.5 h-4 w-4  ml-2"
                   >
                     <path
                       strokeLinecap="round"
@@ -68,15 +70,10 @@ const AdminMatchingTasks = ({
                     />
                   </svg>
                 )}
-                <p className="whitespace-nowrap text-sm mt-1">
-                  {taskData.blankTaskStatus && taskData.multTaskStatus
-                    ? "Completed"
-                    : "Pending"}
-                </p>
               </span>
             </div>
           </div>
-          <div className="whitespace-nowrap text-center w-[150px] py-2">
+          <div className="whitespace-nowrap text-center w-[100px] py-2">
             <button
               onClick={() => onCompleteHandler(taskData)}
               className={`rounded-3xl px-4 py-1 font-semibold ${
@@ -86,15 +83,20 @@ const AdminMatchingTasks = ({
               }`}
               disabled={!taskData.blankTaskStatus || !taskData.multTaskStatus}
             >
-              Start Again
+              <MdOutlineRestartAlt />
             </button>
           </div>
-          <div className="whitespace-nowrap text-center w-[150px] py-2">
+          <div className="whitespace-nowrap text-center w-[100px] py-2">
             <button
               onClick={() => onDownloadHandler(taskData)}
-              className="rounded-3xl border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white"
+              className={`rounded-3xl px-4 py-1 font-semibold ${
+                taskData.blankTaskStatus && taskData.multTaskStatus
+                  ? "bg-indigo-500 text-white border border-indigo-500"
+                  : "bg-gray-400 text-gray-600 cursor-not-allowed"
+              }`}
+              disabled={!taskData.blankTaskStatus || !taskData.multTaskStatus}
             >
-              Download
+              <FaCloudDownloadAlt />
             </button>
           </div>
           <div
@@ -102,17 +104,12 @@ const AdminMatchingTasks = ({
               setTaskEditId(taskData.id);
               setTaskEdit(true);
             }}
-            className="whitespace-nowrap text-center w-[200px] py-2"
+            className="whitespace-nowrap text-center w-[100px] py-2"
           >
             <button className="rounded border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white">
-              Edit
+              <FaRegEdit />
             </button>
           </div>
-          {/* <div className="whitespace-nowrap text-center w-[200px] py-2">
-            <button className="rounded border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white">
-              Remove
-            </button>
-          </div> */}
         </div>
       ))}
     </div>

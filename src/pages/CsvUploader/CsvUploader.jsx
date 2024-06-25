@@ -207,6 +207,7 @@ const CsvUploader = () => {
           pageCount: data.pageCount,
           id: data.id,
           typeOption: data.typeOption,
+          patternDefinition: data.patternDefinition,
         },
         metaData: [...data.templetedata],
       };

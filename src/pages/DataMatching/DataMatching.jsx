@@ -259,13 +259,7 @@ const DataMatching = () => {
       }
     }
   };
-  
 
-
-
-
-
-  
   // Api for getting the image from the backend
   const onImageHandler = async (
     direction,
@@ -503,35 +497,35 @@ const DataMatching = () => {
   };
 
   const onTaskStartHandler = async () => {
-    if (currentTaskData.blankTaskStatus && currentTaskData.multTaskStatus) {
-      toast.warning("Task is already completed.");
-      setPopUp(true);
-      setStartModal(true);
-      return;
-    }
+    // if (currentTaskData.blankTaskStatus && currentTaskData.multTaskStatus) {
+    //   toast.warning("Task is already completed.");
+    //   setPopUp(true);
+    //   setStartModal(true);
+    //   return;
+    // }
 
-    if (blankChecked && blankCount < 1) {
-      toast.warning("Please enter a value greater than zero for blank.");
-      return;
-    }
+    // if (blankChecked && blankCount < 1) {
+    //   toast.warning("Please enter a value greater than zero for blank.");
+    //   return;
+    // }
 
-    if (!blankChecked && !multChecked && !allDataChecked) {
-      toast.warning("Please select at least one option.");
-      return;
-    }
+    // if (!blankChecked && !multChecked && !allDataChecked) {
+    //   toast.warning("Please select at least one option.");
+    //   return;
+    // }
 
-    if (blankChecked && !blankCount) {
-      toast.warning("Please enter the number of blanks.");
-      return;
-    }
+    // if (blankChecked && !blankCount) {
+    //   toast.warning("Please enter the number of blanks.");
+    //   return;
+    // }
 
-    if (multChecked && !pattern) {
-      toast.warning(
-        "Please enter a valid pattern following set:( /, -, *, ~, >.)"
-      );
+    // if (multChecked && !pattern) {
+    //   toast.warning(
+    //     "Please enter a valid pattern following set:( /, -, *, ~, >.)"
+    //   );
 
-      return;
-    }
+    //   return;
+    // }
 
     setLoading(true);
     const conditions = {
@@ -680,6 +674,8 @@ const DataMatching = () => {
                     allTasks={allTasks}
                     onDataTypeSelectHandler={onDataTypeSelectHandler}
                     compareTask={compareTask}
+                    onTaskStartHandler={onTaskStartHandler}
+                    setCurrentTaskData={setCurrentTaskData}
                   />
                 ) : (
                   <>

@@ -5,6 +5,8 @@ const UserTaskAssined = ({
   allTasks,
   onDataTypeSelectHandler,
   compareTask,
+  onTaskStartHandler,
+  setCurrentTaskData,
 }) => {
   return (
     <div className="h-[100vh] flex justify-center bg-gradient-to-r from-blue-700 to-purple-700  items-center templatemapping pt-20">
@@ -124,9 +126,10 @@ const UserTaskAssined = ({
                             </div>
                             <div className="whitespace-nowrap text-center w-[150px] px-4">
                               <button
-                                onClick={() =>
-                                  onDataTypeSelectHandler(taskData)
-                                }
+                                onClick={() => {
+                                  onTaskStartHandler(taskData);
+                                  setCurrentTaskData(taskData);
+                                }}
                                 className="rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white"
                               >
                                 Start
