@@ -24,7 +24,7 @@ const DataMatching = () => {
   const [popUp, setPopUp] = useState(true);
   const [startModal, setStartModal] = useState(true);
   const [imageUrls, setImageUrls] = useState([]);
-  const [templateHeaders, setTemplateHeaders] = useState();
+  const [templateHeaders, setTemplateHeaders] = useState(null);
   const [csvCurrentData, setCsvCurrentData] = useState([]);
   const [allTasks, setAllTasks] = useState([]);
   const [imageColName, setImageColName] = useState("");
@@ -39,7 +39,6 @@ const DataMatching = () => {
   const [multChecked, setMultChecked] = useState(false);
   const [allDataChecked, setAllDataChecked] = useState(false);
   const [imageNotFound, setImageNotFound] = useState(true);
-  const [dataTypeChecker, setDataTypeChecker] = useState("");
   const [currentFocusIndex, setCurrentFocusIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(1);
@@ -154,14 +153,6 @@ const DataMatching = () => {
     }
   };
 
-  // Check is current data is OK
-
-  const isCurrentDataCurrect = (currentData) => {
-    const csvDataKeys = Object.keys(csvData[0]);
-    console.log(csvDataKeys);
-    console.log(templateHeaders);
-  };
-
   // Sortcuts buttons
   useEffect(() => {
     if (!popUp) {
@@ -272,13 +263,16 @@ const DataMatching = () => {
       const regex = new RegExp(pattern);
       return Object.keys(object).filter((key) => regex.test(object[key]));
     };
-
     const imageNames = [];
-    for (let i = 0; i < templateHeaders.pageCount; i++) {
-      imageNames.push(...getKeysByPattern(headers, `Image${i + 1}`));
+    let i = 1;
+    while (true) {
+      const keys = getKeysByPattern(headers, `Image${i}`);
+      if (keys.length === 0) break;
+      imageNames.push(...keys);
+      i++;
     }
     setImageColNames(imageNames);
-
+    console.log(imageNames);
     try {
       let newIndex = currMatchingIndex;
       let allImagePaths;
@@ -309,15 +303,6 @@ const DataMatching = () => {
           imageNameArray: allImagePaths,
           rowIndex: csvData[newIndex].rowIndex,
           id: taskData.id,
-          colName: allDataChecked
-            ? "allDataIndex"
-            : multChecked && blankChecked
-            ? "multAndBlankDataIndex"
-            : multChecked && !blankChecked
-            ? "multDataIndex"
-            : !multChecked && blankChecked
-            ? "blankDataIndex"
-            : "",
         },
         {
           headers: {
@@ -325,6 +310,8 @@ const DataMatching = () => {
           },
         }
       );
+
+      console.log(response);
       // const url = response.data?.base64Image;
       // const pathParts = imageName1?.split("/");
       // setCurrImageName(pathParts[pathParts.length - 1]);
@@ -348,6 +335,7 @@ const DataMatching = () => {
         imageRef.current.style.transform = "none";
         imageRef.current.style.transformOrigin = "initial";
       }
+      setLoading(false);
       setModifiedKeys(null);
       setZoomLevel(1);
       setImageUrls(response.data.arrayOfImages);
@@ -496,122 +484,35 @@ const DataMatching = () => {
     }
   };
 
-  const onTaskStartHandler = async () => {
-    // if (currentTaskData.blankTaskStatus && currentTaskData.multTaskStatus) {
-    //   toast.warning("Task is already completed.");
-    //   setPopUp(true);
-    //   setStartModal(true);
-    //   return;
-    // }
-
-    // if (blankChecked && blankCount < 1) {
-    //   toast.warning("Please enter a value greater than zero for blank.");
-    //   return;
-    // }
-
-    // if (!blankChecked && !multChecked && !allDataChecked) {
-    //   toast.warning("Please select at least one option.");
-    //   return;
-    // }
-
-    // if (blankChecked && !blankCount) {
-    //   toast.warning("Please enter the number of blanks.");
-    //   return;
-    // }
-
-    // if (multChecked && !pattern) {
-    //   toast.warning(
-    //     "Please enter a valid pattern following set:( /, -, *, ~, >.)"
-    //   );
-
-    //   return;
-    // }
-
+  const onTaskStartHandler = async (taskData) => {
     setLoading(true);
-    const conditions = {
-      Blank: blankChecked ? Number(blankCount) : 0,
-      Pattern: pattern,
-      "*": multChecked,
-      AllData: allDataChecked,
-    };
-
-    const updatedTasks = {
-      ...currentTaskData,
-      conditions,
-    };
-
-    if (allDataChecked) {
-      setDataTypeChecker("allDataIndex");
-    } else if (multChecked && blankChecked) {
-      setDataTypeChecker("multAndBlankDataIndex");
-    } else if (multChecked && !blankChecked) {
-      setDataTypeChecker("multDataIndex");
-    } else if (!multChecked && blankChecked) {
-      setDataTypeChecker("blankDataIndex");
-    }
 
     try {
       const response = await axios.post(
         `http://${REACT_APP_IP}:4000/get/csvdata`,
-        { taskData: updatedTasks },
+        { taskData: taskData },
         {
           headers: {
             token: token,
           },
         }
       );
-      let currRowIndex;
 
-      if (allDataChecked) {
-        setDataTypeChecker("allDataIndex");
-        currRowIndex = response.data.rowIndexdata.allDataIndex;
-      } else if (multChecked && blankChecked) {
-        setDataTypeChecker("multAndBlankDataIndex");
-        currRowIndex = response.data.rowIndexdata.multAndBlankDataIndex;
-      } else if (multChecked && !blankChecked) {
-        setDataTypeChecker("multDataIndex");
-        currRowIndex = response.data.rowIndexdata.multDataIndex;
-      } else if (!multChecked && blankChecked) {
-        setDataTypeChecker("blankDataIndex");
-        currRowIndex = response.data.rowIndexdata.blankDataIndex;
-      }
-
-      setCsvData(response.data.filteredData);
-      let matchingIndex;
-      for (let i = 0; i < response.data.filteredData.length; i++) {
-        if (response.data.filteredData[i].rowIndex === Number(currRowIndex)) {
-          matchingIndex = i;
+      setCsvData(response.data);
+      let matching;
+      for (let i = 0; i < response.data.length; i++) {
+        if (response.data[i]["rowIndex"] == taskData.currentIndex) {
+          matching = i;
           break;
         }
       }
 
-      if (matchingIndex === 0 || matchingIndex === undefined) {
-        setCurrentIndex(1);
-        onImageHandler("initial", 1, response.data.filteredData, updatedTasks);
-      } else {
-        setCurrentIndex(matchingIndex);
-        onImageHandler(
-          "initial",
-          matchingIndex,
-          response.data.filteredData,
-          updatedTasks
-        );
-      }
-      setLoading(false);
+      onImageHandler("initial", matching, response.data, taskData);
       setPopUp(false);
     } catch (error) {
       setLoading(false);
       toast.error(error?.response?.data?.error);
     }
-  };
-
-  const onDataTypeSelectHandler = (taskData) => {
-    if (taskData.taskStatus) {
-      toast.warning("Task is aready completed.");
-      return;
-    }
-    setStartModal(false);
-    setCurrentTaskData(taskData);
   };
 
   const onCompareTaskStartHandler = (taskdata) => {
@@ -672,7 +573,6 @@ const DataMatching = () => {
                   <UserTaskAssined
                     onCompareTaskStartHandler={onCompareTaskStartHandler}
                     allTasks={allTasks}
-                    onDataTypeSelectHandler={onDataTypeSelectHandler}
                     compareTask={compareTask}
                     onTaskStartHandler={onTaskStartHandler}
                     setCurrentTaskData={setCurrentTaskData}

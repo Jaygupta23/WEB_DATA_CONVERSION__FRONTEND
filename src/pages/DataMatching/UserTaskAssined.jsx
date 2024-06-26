@@ -1,13 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 
 const UserTaskAssined = ({
   onCompareTaskStartHandler,
   allTasks,
-  onDataTypeSelectHandler,
   compareTask,
   onTaskStartHandler,
   setCurrentTaskData,
 }) => {
+  const [loadingTaskId, setLoadingTaskId] = useState(null);
+
+  const handleStartClick = (taskData) => {
+    setLoadingTaskId(taskData.id);
+    onTaskStartHandler(taskData);
+    setCurrentTaskData(taskData);
+    setTimeout(() => setLoadingTaskId(null), 3000);
+  };
+
   return (
     <div className="h-[100vh] flex justify-center bg-gradient-to-r from-blue-700 to-purple-700  items-center templatemapping pt-20">
       <div className="">
@@ -124,15 +132,28 @@ const UserTaskAssined = ({
                                 </span>
                               </div>
                             </div>
-                            <div className="whitespace-nowrap text-center w-[150px] px-4">
+                            <div
+                              className="whitespace-nowrap text-center w-[150px] px-4"
+                              key={taskData.id}
+                            >
                               <button
-                                onClick={() => {
-                                  onTaskStartHandler(taskData);
-                                  setCurrentTaskData(taskData);
-                                }}
-                                className="rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white"
+                                onClick={() => handleStartClick(taskData)}
+                                type="button"
+                                disabled={loadingTaskId === taskData.id}
+                                className={`rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white ${
+                                  loadingTaskId === taskData.id
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                                }`}
                               >
-                                Start
+                                {loadingTaskId === taskData.id ? (
+                                  <div className="flex items-center justify-center">
+                                    <span className="mr-2">Loading...</span>
+                                    <div className="animate-spin rounded-full border-b-2 border-white"></div>
+                                  </div>
+                                ) : (
+                                  "Start"
+                                )}
                               </button>
                             </div>
                           </div>

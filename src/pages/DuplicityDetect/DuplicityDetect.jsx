@@ -125,11 +125,11 @@ const ImageScanner = () => {
 
   useEffect(() => {
     const handleKeyDown = (event) => {
-      if (event.key === "PageUp" && currentImageIndex > 0) {
+      if (event.key === "ArrowLeft" && currentImageIndex > 0) {
         setCurrentImageIndex(currentImageIndex - 1);
         setImageUrl(currentRowData.imagePaths[currentImageIndex - 1]);
       } else if (
-        event.key === "PageDown" &&
+        event.key === "ArrowRight" &&
         currentImageIndex < currentRowData?.imagePaths.length - 1
       ) {
         setCurrentImageIndex(currentImageIndex + 1);
@@ -141,12 +141,13 @@ const ImageScanner = () => {
         } else {
           console.error("currentRowData is null when trying to update.");
         }
-      } else if (event.key === "ArrowLeft") {
+      } else if (event.ctrlKey && event.key === "ArrowLeft") {
         if (editModal) {
           setEditModal(false);
         } else if (!showDuplicates) {
           setShowDuplicates(true);
         }
+        setShowDuplicateField(false);
       }
     };
 

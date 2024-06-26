@@ -273,19 +273,20 @@ const ImageScanner = () => {
       });
       setSelectedCoordinates(updatedSelectedCoordinate);
     } else {
-      console.log(newObj);
       setSelectedCoordinates((prev) => [...prev, newObj]);
     }
-
+    console.log(selectType);
     setInputField("");
     setFieldType("");
-    setOpen(false);
     setLengthOfField("");
     setSelectType("");
     setQuestionRange({
       min: "",
       max: "",
     });
+    console.log(selectType);
+
+    setOpen(false);
     setSelectedCoordinateData(null);
     toast.success("Coordinate successfully added.");
   };

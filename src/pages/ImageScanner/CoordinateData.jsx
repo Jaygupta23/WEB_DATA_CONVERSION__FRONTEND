@@ -110,6 +110,7 @@ const CoordinateData = ({
                   <div className="flex gap-10">
                     <select
                       onChange={(e) => setSelectType(e.target.value)}
+                      value={selectType}
                       className="input w-full sm:w-[32%] border-2 font-semibold bg-white text-lg focus:border-1 rounded-xl px-3 py-2 shadow-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                     >
                       <option value="">Select Type</option>
