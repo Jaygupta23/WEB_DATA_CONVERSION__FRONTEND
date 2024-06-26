@@ -10,10 +10,8 @@ import {
 } from "../../services/common";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { LuLoader } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import AdminAssined from "./AdminAssined";
-import DataOption from "./DataOption";
 import UserTaskAssined from "./UserTaskAssined";
 import FormDataSection from "./FormDataSection";
 import QuestionsDataSection from "./QuestionsDataSection";
@@ -22,7 +20,6 @@ import ButtonSection from "./ButtonSection";
 
 const DataMatching = () => {
   const [popUp, setPopUp] = useState(true);
-  const [startModal, setStartModal] = useState(true);
   const [imageUrls, setImageUrls] = useState([]);
   const [templateHeaders, setTemplateHeaders] = useState(null);
   const [csvCurrentData, setCsvCurrentData] = useState([]);
@@ -30,8 +27,6 @@ const DataMatching = () => {
   const [imageColName, setImageColName] = useState("");
   const [imageColNames, setImageColNames] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [blankCount, setBlackCount] = useState(1);
-  const [pattern, setPattern] = useState("");
   const [currentTaskData, setCurrentTaskData] = useState({});
   const [selectedCoordintes, setSelectedCoordinates] = useState(false);
   const [blankChecked, setBlankChecked] = useState(false);
@@ -45,7 +40,6 @@ const DataMatching = () => {
   const [compareTask, setCompareTask] = useState([]);
   const [csvData, setCsvData] = useState([]);
   const [userRole, setUserRole] = useState();
-  const [loading, setLoading] = useState(false);
   const imageContainerRef = useRef(null);
   const imageRef = useRef(null);
   const token = JSON.parse(localStorage.getItem("userData"));
@@ -123,6 +117,7 @@ const DataMatching = () => {
       toast.success("Data updated successfully.");
       return;
     }
+
     try {
       await axios.post(
         `http://${REACT_APP_IP}:4000/updatecsvdata/${parseInt(
@@ -130,7 +125,7 @@ const DataMatching = () => {
         )}`,
         {
           updatedData: csvCurrentData,
-          index: csvCurrentData.rowIndex + 2,
+          index: csvCurrentData.rowIndex + 1,
           updatedColumn: modifiedKeys,
         },
         {
@@ -271,10 +266,12 @@ const DataMatching = () => {
       imageNames.push(...keys);
       i++;
     }
+
     setImageColNames(imageNames);
-    console.log(imageNames);
+
     try {
       let newIndex = currMatchingIndex;
+
       let allImagePaths;
       if (direction === "initial") {
         const objects = csvData[newIndex];
@@ -311,7 +308,6 @@ const DataMatching = () => {
         }
       );
 
-      console.log(response);
       // const url = response.data?.base64Image;
       // const pathParts = imageName1?.split("/");
       // setCurrImageName(pathParts[pathParts.length - 1]);
@@ -335,13 +331,13 @@ const DataMatching = () => {
         imageRef.current.style.transform = "none";
         imageRef.current.style.transformOrigin = "initial";
       }
-      setLoading(false);
       setModifiedKeys(null);
       setZoomLevel(1);
       setImageUrls(response.data.arrayOfImages);
       setImageNotFound(true);
       setPopUp(false);
     } catch (error) {
+      console.log(error);
       toast.error("Image not found!.");
       setImageNotFound(false);
     }
@@ -361,6 +357,7 @@ const DataMatching = () => {
         break;
       }
     }
+
     const matchedCoordinate = templateHeaders?.templetedata?.find(
       (data) => data.attribute === matchedValue
     );
@@ -390,6 +387,69 @@ const DataMatching = () => {
           return prevData;
         }
       } else {
+        const csvHeader = csvData[0];
+        const formData = templateHeaders?.templetedata?.filter(
+          (data) => data.fieldType === "formField"
+        );
+
+
+        const currentFormData = formData.find(
+          (data) => data.attribute === csvHeader[key]
+        );
+
+        console.log(currentFormData)
+
+        if (!currentFormData) {
+          return prevData;
+        }
+
+        const { dataFieldType, fieldLength, fieldRange } = currentFormData;
+
+        // Remove input data if it's an empty string
+        if (newValue === "") {
+          setModifiedKeys((prevKeys) => ({
+            ...prevKeys,
+            [key]: [newValue, previousValue],
+          }));
+
+          return {
+            ...prevData,
+            [key]: newValue,
+          };
+        }
+
+        // Check data field type
+        if (dataFieldType === "number") {
+          // Validate number
+          if (!/^\d*$/.test(newValue)) {
+            return prevData;
+          }
+        } else if (dataFieldType === "text") {
+          // Validate text (no digits)
+          if (/\d/.test(newValue)) {
+            return prevData;
+          }
+        } else if (dataFieldType === "alphanumeric") {
+          // Validate alphanumeric
+          if (!/^[a-z0-9]*$/i.test(newValue)) {
+            return prevData;
+          }
+        }
+
+        // Check field length
+        if (fieldLength && newValue.length > fieldLength) {
+          return prevData;
+        }
+
+        // Check field range if applicable
+        if (fieldRange) {
+          const [min, max] = fieldRange.split("-").map(Number);
+          const numValue = Number(newValue);
+          if (numValue < min || numValue > max) {
+            return prevData;
+          }
+        }
+
         setModifiedKeys((prevKeys) => ({
           ...prevKeys,
           [key]: [newValue, previousValue],
@@ -402,6 +462,7 @@ const DataMatching = () => {
       }
     });
   };
+
   const imageFocusHandler = (headerName) => {
     const csvDataKeys = Object.keys(csvData[0]);
     let matchedValue = null;
@@ -472,21 +533,7 @@ const DataMatching = () => {
     setSelectedCoordinates(true);
   };
 
-  const handleCheckboxChange = (checkbox) => {
-    if (checkbox === "blank") {
-      setBlankChecked(!blankChecked);
-      setAllDataChecked(false);
-    } else if (checkbox === "mult") {
-      setMultChecked(!multChecked);
-      setAllDataChecked(false);
-    } else if (checkbox === "allData") {
-      setAllDataChecked(!allDataChecked);
-    }
-  };
-
   const onTaskStartHandler = async (taskData) => {
-    setLoading(true);
-
     try {
       const response = await axios.post(
         `http://${REACT_APP_IP}:4000/get/csvdata`,
@@ -499,18 +546,21 @@ const DataMatching = () => {
       );
 
       setCsvData(response.data);
-      let matching;
+      let matchingIndex;
       for (let i = 0; i < response.data.length; i++) {
         if (response.data[i]["rowIndex"] == taskData.currentIndex) {
-          matching = i;
+          matchingIndex = i;
           break;
         }
       }
 
-      onImageHandler("initial", matching, response.data, taskData);
+      if (matchingIndex === undefined || matchingIndex === 0) {
+        matchingIndex = 1;
+      }
+      setCurrentIndex(matchingIndex);
+      onImageHandler("initial", matchingIndex, response.data, taskData);
       setPopUp(false);
     } catch (error) {
-      setLoading(false);
       toast.error(error?.response?.data?.error);
     }
   };
@@ -538,7 +588,6 @@ const DataMatching = () => {
       );
 
       setPopUp(true);
-      setStartModal(true);
       toast.success("task complted successfully.");
     } catch (error) {
       toast.error(error.message);
@@ -569,32 +618,13 @@ const DataMatching = () => {
           <div>
             {popUp && (
               <>
-                {startModal ? (
-                  <UserTaskAssined
-                    onCompareTaskStartHandler={onCompareTaskStartHandler}
-                    allTasks={allTasks}
-                    compareTask={compareTask}
-                    onTaskStartHandler={onTaskStartHandler}
-                    setCurrentTaskData={setCurrentTaskData}
-                  />
-                ) : (
-                  <>
-                    <DataOption
-                      blankChecked={blankChecked}
-                      handleCheckboxChange={handleCheckboxChange}
-                      blankCount={blankCount}
-                      pattern={pattern}
-                      setBlackCount={setBlackCount}
-                      setPattern={setPattern}
-                      multChecked={multChecked}
-                      allDataChecked={allDataChecked}
-                      onTaskStartHandler={onTaskStartHandler}
-                      currentTaskData={currentTaskData}
-                      loading={loading}
-                      setStartModal={setStartModal}
-                    />
-                  </>
-                )}
+                <UserTaskAssined
+                  onCompareTaskStartHandler={onCompareTaskStartHandler}
+                  allTasks={allTasks}
+                  compareTask={compareTask}
+                  onTaskStartHandler={onTaskStartHandler}
+                  setCurrentTaskData={setCurrentTaskData}
+                />
               </>
             )}
             {!popUp && (
