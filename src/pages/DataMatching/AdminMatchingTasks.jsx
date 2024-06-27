@@ -34,12 +34,12 @@ const AdminMatchingTasks = ({
             <div className="text-md text-center">
               <span
                 className={`inline-flex items-center justify-center rounded-full ${
-                  !taskData.blankTaskStatus || !taskData.multTaskStatus
+                  !taskData.taskStatus
                     ? "bg-amber-100 text-amber-700"
                     : "bg-emerald-100 text-emerald-700"
                 } px-2.5 py-0.5`}
               >
-                {!taskData.blankTaskStatus || !taskData.multTaskStatus ? (
+                {!taskData.taskStatus ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -77,11 +77,11 @@ const AdminMatchingTasks = ({
             <button
               onClick={() => onCompleteHandler(taskData)}
               className={`rounded-3xl px-4 py-1 font-semibold ${
-                taskData.blankTaskStatus && taskData.multTaskStatus
+                taskData.taskStatus
                   ? "bg-indigo-500 text-white border border-indigo-500"
                   : "bg-gray-400 text-gray-600 cursor-not-allowed"
               }`}
-              disabled={!taskData.blankTaskStatus || !taskData.multTaskStatus}
+              disabled={!taskData.taskStatus}
             >
               <MdOutlineRestartAlt />
             </button>
@@ -90,11 +90,11 @@ const AdminMatchingTasks = ({
             <button
               onClick={() => onDownloadHandler(taskData)}
               className={`rounded-3xl px-4 py-1 font-semibold ${
-                taskData.blankTaskStatus && taskData.multTaskStatus
+                taskData.taskStatus
                   ? "bg-indigo-500 text-white border border-indigo-500"
                   : "bg-gray-400 text-gray-600 cursor-not-allowed"
               }`}
-              disabled={!taskData.blankTaskStatus || !taskData.multTaskStatus}
+              disabled={!taskData.taskStatus}
             >
               <FaCloudDownloadAlt />
             </button>

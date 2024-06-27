@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const UserTaskAssined = ({
   onCompareTaskStartHandler,
@@ -10,6 +11,11 @@ const UserTaskAssined = ({
   const [loadingTaskId, setLoadingTaskId] = useState(null);
 
   const handleStartClick = (taskData) => {
+    if (taskData?.taskStatus) {
+      toast.warning("Task is already completed.");
+      return;
+    }
+
     setLoadingTaskId(taskData.id);
     onTaskStartHandler(taskData);
     setCurrentTaskData(taskData);
@@ -56,7 +62,7 @@ const UserTaskAssined = ({
                       </div>
                     </div>
                     <div className="divide-y divide-gray-200 bg-white overflow-y-auto max-h-[300px]">
-                      {allTasks?.map((taskData, index) => (
+                      {allTasks?.map((taskData) => (
                         <>
                           <div key={taskData.id} className="flex  py-2 w-full">
                             <div className="whitespace-nowrap w-[150px] px-4">
@@ -85,14 +91,12 @@ const UserTaskAssined = ({
                               <div className="text-md text-center">
                                 <span
                                   className={`inline-flex items-center justify-center rounded-full ${
-                                    !taskData.blankTaskStatus ||
-                                    !taskData.multTaskStatus
+                                    !taskData.taskStatus
                                       ? "bg-amber-100 text-amber-700"
                                       : "bg-emerald-100 text-emerald-700"
                                   } px-2.5 py-0.5 `}
                                 >
-                                  {!taskData.blankTaskStatus ||
-                                  !taskData.multTaskStatus ? (
+                                  {!taskData.taskStatus ? (
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
                                       fill="none"
@@ -124,8 +128,7 @@ const UserTaskAssined = ({
                                     </svg>
                                   )}
                                   <p className="whitespace-nowrap text-sm">
-                                    {taskData.blankTaskStatus &&
-                                    taskData.multTaskStatus
+                                    {taskData.taskStatus
                                       ? "Completed"
                                       : "Pending"}
                                   </p>

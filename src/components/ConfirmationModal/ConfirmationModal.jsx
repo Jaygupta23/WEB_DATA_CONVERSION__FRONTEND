@@ -1,9 +1,11 @@
 import React from "react";
 
-const ConfirmationTemplateSave = ({
+const ConfirmationModal = ({
   confirmationModal,
   onSubmitHandler,
   setConfirmationModal,
+  heading,
+  message,
 }) => {
   return (
     <div>
@@ -49,12 +51,10 @@ const ConfirmationTemplateSave = ({
                       className="text-lg font-medium text-gray-900"
                       id="modal-title"
                     >
-                      Template Saved
+                      {heading}
                     </h3>
                     <div className="mt-2">
-                      <p className="text-sm text-gray-500">
-                        Your template has been successfully saved.
-                      </p>
+                      <p className="text-sm text-gray-500">{message}</p>
                     </div>
                   </div>
                 </div>
@@ -83,4 +83,4 @@ const ConfirmationTemplateSave = ({
   );
 };
 
-export default ConfirmationTemplateSave;
+export default ConfirmationModal;

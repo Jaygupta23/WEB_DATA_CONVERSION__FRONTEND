@@ -114,9 +114,9 @@ const CoordinateData = ({
                       className="input w-full sm:w-[32%] border-2 font-semibold bg-white text-lg focus:border-1 rounded-xl px-3 py-2 shadow-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                     >
                       <option value="">Select Type</option>
-                      <option value="text">Text</option>
-                      <option value="number">Number</option>
-                      <option value="alphanumeric">Alphanumeric</option>
+                      <option value="text">Alpha</option>
+                      <option value="number">Numeric</option>
+                      <option value="alphanumeric">AlphaNumeric</option>
                     </select>
                     {selectType === "number" && (
                       <div className="flex gap-5">

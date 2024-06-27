@@ -17,6 +17,7 @@ import FormDataSection from "./FormDataSection";
 import QuestionsDataSection from "./QuestionsDataSection";
 import ImageSection from "./ImageSection";
 import ButtonSection from "./ButtonSection";
+import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 
 const DataMatching = () => {
   const [popUp, setPopUp] = useState(true);
@@ -29,16 +30,14 @@ const DataMatching = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentTaskData, setCurrentTaskData] = useState({});
   const [selectedCoordintes, setSelectedCoordinates] = useState(false);
-  const [blankChecked, setBlankChecked] = useState(false);
   const [modifiedKeys, setModifiedKeys] = useState({});
-  const [multChecked, setMultChecked] = useState(false);
-  const [allDataChecked, setAllDataChecked] = useState(false);
   const [imageNotFound, setImageNotFound] = useState(true);
   const [currentFocusIndex, setCurrentFocusIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [currentIndex, setCurrentIndex] = useState(1);
   const [compareTask, setCompareTask] = useState([]);
   const [csvData, setCsvData] = useState([]);
+  const [confirmationModal, setConfirmationModal] = useState();
   const [userRole, setUserRole] = useState();
   const imageContainerRef = useRef(null);
   const imageRef = useRef(null);
@@ -392,64 +391,81 @@ const DataMatching = () => {
           (data) => data.fieldType === "formField"
         );
 
-
         const currentFormData = formData.find(
           (data) => data.attribute === csvHeader[key]
         );
 
-        console.log(currentFormData)
-
         if (!currentFormData) {
           return prevData;
         }
-
         const { dataFieldType, fieldLength, fieldRange } = currentFormData;
-
-        // Remove input data if it's an empty string
-        if (newValue === "") {
-          setModifiedKeys((prevKeys) => ({
-            ...prevKeys,
-            [key]: [newValue, previousValue],
-          }));
-
-          return {
-            ...prevData,
-            [key]: newValue,
-          };
-        }
-
-        // Check data field type
         if (dataFieldType === "number") {
-          // Validate number
-          if (!/^\d*$/.test(newValue)) {
-            return prevData;
+          if (!/^[0-9]+$/.test(newValue)) {
+            return {
+              ...prevData,
+              [key]: newValue ? previousValue : "",
+            };
+          } else if (newValue.length > +fieldLength) {
+            return {
+              ...prevData,
+              [key]: previousValue,
+            };
+          } else {
+            setModifiedKeys((prevKeys) => ({
+              ...prevKeys,
+              [key]: [newValue, previousValue],
+            }));
+
+            return {
+              ...prevData,
+              [key]: newValue,
+            };
           }
         } else if (dataFieldType === "text") {
-          // Validate text (no digits)
-          if (/\d/.test(newValue)) {
-            return prevData;
+          if (!/^[a-zA-Z]+$/.test(newValue)) {
+            return {
+              ...prevData,
+              [key]: newValue ? previousValue : "",
+            };
+          } else if (newValue.length > +fieldLength) {
+            return {
+              ...prevData,
+              [key]: previousValue,
+            };
+          } else {
+            setModifiedKeys((prevKeys) => ({
+              ...prevKeys,
+              [key]: [newValue, previousValue],
+            }));
+
+            return {
+              ...prevData,
+              [key]: newValue,
+            };
           }
         } else if (dataFieldType === "alphanumeric") {
-          // Validate alphanumeric
-          if (!/^[a-z0-9]*$/i.test(newValue)) {
-            return prevData;
+          if (!/^[a-zA-Z0-9]+$/.test(newValue)) {
+            return {
+              ...prevData,
+              [key]: newValue ? previousValue : "",
+            };
+          } else if (newValue.length > +fieldLength) {
+            return {
+              ...prevData,
+              [key]: previousValue,
+            };
+          } else {
+            setModifiedKeys((prevKeys) => ({
+              ...prevKeys,
+              [key]: [newValue, previousValue],
+            }));
+
+            return {
+              ...prevData,
+              [key]: newValue,
+            };
           }
         }
-
-        // Check field length
-        if (fieldLength && newValue.length > fieldLength) {
-          return prevData;
-        }
-
-        // Check field range if applicable
-        if (fieldRange) {
-          const [min, max] = fieldRange.split("-").map(Number);
-          const numValue = Number(newValue);
-          if (numValue < min || numValue > max) {
-            return prevData;
-          }
-        }
-
         setModifiedKeys((prevKeys) => ({
           ...prevKeys,
           [key]: [newValue, previousValue],
@@ -577,8 +593,7 @@ const DataMatching = () => {
           currentTaskData?.id
         )}`,
         {
-          blankTaskStatus: allDataChecked ? true : blankChecked,
-          multTaskStatus: allDataChecked ? true : multChecked,
+          taskStatus: true,
         },
         {
           headers: {
@@ -707,7 +722,7 @@ const DataMatching = () => {
                         </button> */}
                           {currentIndex === csvData.length - 1 && (
                             <button
-                              onClick={onCompleteHandler}
+                              onClick={() => setConfirmationModal(true)}
                               className="px-4 py-2 bg-teal-600 mx-2 text-white rounded-3xl hover:bg-teal-700"
                             >
                               Task Completed
@@ -750,6 +765,17 @@ const DataMatching = () => {
                     </div>
                   )}
                 </div>
+
+                {/* CONFIRMATION MODAL */}
+                <ConfirmationModal
+                  confirmationModal={confirmationModal}
+                  onSubmitHandler={onCompleteHandler}
+                  setConfirmationModal={setConfirmationModal}
+                  heading={"Confirm Task Completion"}
+                  message={
+                    "Please confirm if you would like to mark this task as complete."
+                  }
+                />
               </div>
             )}
           </div>

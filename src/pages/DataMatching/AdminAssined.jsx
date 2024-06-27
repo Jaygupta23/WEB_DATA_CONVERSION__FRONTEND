@@ -190,7 +190,7 @@ const AdminAssined = () => {
   };
 
   const onDownloadHandler = async (currentTaskData) => {
-    if (!currentTaskData.blankTaskStatus || !currentTaskData.multTaskStatus) {
+    if (!currentTaskData.taskStatus) {
       toast.warning("The task is pending, so downloading is not available.");
       return;
     }
@@ -242,7 +242,7 @@ const AdminAssined = () => {
     try {
       await axios.post(
         `http://${REACT_APP_IP}:4000/taskupdation/${parseInt(currentTask.id)}`,
-        { blankTaskStatus: false, multTaskStatus: false },
+        { taskStatus: false },
         {
           headers: {
             token: token,
@@ -251,7 +251,7 @@ const AdminAssined = () => {
       );
       const updatedTasks = matchingTask.map((task) => {
         if (task.id === currentTask.id) {
-          return { ...task, blankTaskStatus: false, multTaskStatus: false };
+          return { ...task, taskStatus: false };
         }
         return task;
       });

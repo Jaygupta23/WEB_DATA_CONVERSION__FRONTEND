@@ -11,8 +11,8 @@ import TemplateData from "./TemplateData";
 import CoordinateData from "./CoordinateData";
 import OptionData from "./OptionData";
 import DynamicInput from "./DynamicInput";
-import ConfirmationTemplateSave from "./ConfirmationTemplateSave";
 import SelectPattern from "./SelectPattern";
+import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
 
 const ImageScanner = () => {
   const [selection, setSelection] = useState(null);
@@ -544,10 +544,12 @@ const ImageScanner = () => {
       />
 
       {/* Confirmation template saving COMPONENT  */}
-      <ConfirmationTemplateSave
+      <ConfirmationModal
         onSubmitHandler={onSubmitHandler}
         confirmationModal={confirmationModal}
         setConfirmationModal={setConfirmationModal}
+        heading={"Template Saved"}
+        message={" Your template has been successfully saved."}
       />
 
       <SelectPattern
