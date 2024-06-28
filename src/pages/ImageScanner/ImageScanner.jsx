@@ -11,8 +11,8 @@ import TemplateData from "./TemplateData";
 import CoordinateData from "./CoordinateData";
 import OptionData from "./OptionData";
 import DynamicInput from "./DynamicInput";
-import SelectPattern from "./SelectPattern";
 import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
+import Permissions from "./Permissions";
 
 const ImageScanner = () => {
   const [selection, setSelection] = useState(null);
@@ -33,8 +33,12 @@ const ImageScanner = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const dataCtx = useContext(dataContext);
   const [selectedRow, setSelectedRow] = useState(null);
-  const [selectPattern, setSelectedPattern] = useState("");
-  const [patternModal, setPatternModal] = useState(false);
+  const [templatePermissions, setTemplatePermissions] = useState({
+    blankDefination: "",
+    patternDefinition: "",
+    isPermittedToEdit: false,
+  });
+  const [permissionModal, setPermissionModal] = useState(false);
   const [selectedCoordinateData, setSelectedCoordinateData] = useState(null);
   const [templateData, setTemplateData] = useState({
     name: "",
@@ -80,12 +84,16 @@ const ImageScanner = () => {
             ...prevState,
             name: dataCtx?.templateData?.templateData?.name,
             pageCount: dataCtx?.templateData?.templateData?.pageCount,
+          }));
+          setTemplatePermissions((prevState) => ({
+            ...prevState,
+            blankDefination:
+              dataCtx?.templateData?.templateData?.blankDefination,
             patternDefinition:
               dataCtx?.templateData?.templateData?.patternDefinition,
+            isPermittedToEdit:
+              dataCtx?.templateData?.templateData?.isPermittedToEdit,
           }));
-          setSelectedPattern(
-            dataCtx?.templateData?.templateData?.patternDefinition
-          );
           setSelectedCoordinates(selectedCoordinatesData);
         }
       }
@@ -305,7 +313,7 @@ const ImageScanner = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
-    if (!selectPattern) {
+    if (!templatePermissions.patternDefinition) {
       toast.error("Please select the pattern");
       return;
     }
@@ -327,6 +335,7 @@ const ImageScanner = () => {
 
     let selectedValues = [];
     let characters = [];
+
     switch (selectedRow) {
       case "upper":
         characters = Array.from({ length: inputValues.length }, (_, index) =>
@@ -344,7 +353,9 @@ const ImageScanner = () => {
         );
         break;
       default:
-        characters = Array(inputValues.length).fill("");
+        characters = inputValues.map((value, index) =>
+          String.fromCharCode(65 + index)
+        );
         break;
     }
 
@@ -356,14 +367,26 @@ const ImageScanner = () => {
         selectedValues.push(item[selectedRow]);
       }
     });
-    const concatenatedString = selectedValues.join("-");
+
+    let concatenatedString = selectedValues.join("-");
+    if (!concatenatedString) {
+      if (selectedRow === "upper") {
+        concatenatedString = "A-B-C-D";
+      } else if (selectedRow === "lower") {
+        concatenatedString = "a-b-c-d";
+      } else if (selectedRow === "number") {
+        concatenatedString = "1-2-3-4";
+      }
+    }
 
     const data = {
       templateData: {
         name: templateData.name,
         pageCount: imageURL.length,
         typeOption: concatenatedString,
-        patternDefinition: selectPattern,
+        patternDefinition: templatePermissions.patternDefinition,
+        blankDefination: templatePermissions.blankDefination,
+        isPermittedToEdit: templatePermissions.isPermittedToEdit,
       },
       templateId: dataCtx?.templateData?.templateData?.id
         ? dataCtx?.templateData?.templateData?.id
@@ -397,7 +420,12 @@ const ImageScanner = () => {
       toast.success("Template created successfully!");
       dataCtx.modifyTemplateData(null);
       localStorage.removeItem("images");
-      setSelectedPattern("");
+      setTemplatePermissions((prevState) => ({
+        ...prevState,
+        blankDefination: "",
+        patternDefinition: "",
+        isPermittedToEdit: false,
+      }));
       navigate("/imageuploader");
     } catch (error) {
       console.log(error);
@@ -466,7 +494,6 @@ const ImageScanner = () => {
       lower: "",
       number: "",
     }));
-
     setInputValues(newInputValues);
   };
 
@@ -530,8 +557,8 @@ const ImageScanner = () => {
             setTemplateData={setTemplateData}
             setOptionModel={setOptionModel}
             setConfirmationModal={setConfirmationModal}
-            setPatternModal={setPatternModal}
-            selectPattern={selectPattern}
+            setPermissionModal={setPermissionModal}
+            templatePermissions={templatePermissions}
           />
         </div>
       </div>
@@ -548,15 +575,15 @@ const ImageScanner = () => {
         onSubmitHandler={onSubmitHandler}
         confirmationModal={confirmationModal}
         setConfirmationModal={setConfirmationModal}
-        heading={"Template Saved"}
-        message={" Your template has been successfully saved."}
+        heading={"Template Submission Confirmation"}
+        message={"Are you sure you want to submit the template?"}
       />
 
-      <SelectPattern
-        selectPattern={selectPattern}
-        setSelectedPattern={setSelectedPattern}
-        patternModal={patternModal}
-        setPatternModal={setPatternModal}
+      <Permissions
+        permissionModal={permissionModal}
+        setPermissionModal={setPermissionModal}
+        templatePermissions={templatePermissions}
+        setTemplatePermissions={setTemplatePermissions}
       />
 
       {/* OPTION DATA MODEL AND FINAL SUBMIT */}
@@ -568,7 +595,8 @@ const ImageScanner = () => {
         setInputValues={setInputValues}
         createInputs={createInputs}
         handleCreateInputs={handleCreateInputs}
-        onSubmitHandler={onSubmitHandler}
+        setConfirmationModal={setConfirmationModal}
+        selectedRow={selectedRow}
       />
 
       {/* RIGHT SECTION  */}
@@ -615,12 +643,16 @@ const ImageScanner = () => {
                       data-bs-toggle="modal"
                       data-bs-target="#exampleModal"
                     />
+
                     <>
                       {selectedCoordinates
                         .filter((data) => data.pageNo === currentImageIndex)
                         .map((data, index) => (
                           <div
                             key={index}
+                            onDoubleClick={() =>
+                              onEditCoordinateDataHanlder(data.fId)
+                            }
                             style={{
                               border: "3px solid #007bff",
                               position: "absolute",

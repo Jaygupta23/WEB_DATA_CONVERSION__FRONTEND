@@ -91,6 +91,10 @@ const TemplateMapping = () => {
     if (isNaN(newMinValue)) {
       newMinValue = taskValue.min;
     }
+    console.log(taskValue.max + " -  >" + totalData);
+    if (taskValue.max == totalData) {
+      setShowModal(true);
+    }
     setTaskValue({ ...taskValue, min: newMinValue, max: "" });
     toast.success("Task successfully assigned. Thank you.");
   };

@@ -214,7 +214,7 @@ const DataMatching = () => {
       const direction = e.shiftKey ? -1 : 1;
 
       while (!loopedOnce || nextIndex !== index) {
-        // Calculate the next index
+        // Calculate the next index based on direction
         nextIndex =
           (nextIndex + direction + inputRefs.current.length) %
           inputRefs.current.length;
@@ -241,6 +241,20 @@ const DataMatching = () => {
         if (nextIndex === index) {
           loopedOnce = true;
         }
+      }
+    } else if (e.key === "Shift") {
+      e.preventDefault();
+
+      let nextIndex = index + 1;
+      if (nextIndex >= inputRefs.current.length) {
+        nextIndex = 0;
+      }
+
+      // Update focus index
+      setCurrentFocusIndex(nextIndex);
+      // Ensure the input reference exists and is focusable
+      if (inputRefs.current[nextIndex]) {
+        inputRefs.current[nextIndex].focus();
       }
     }
   };
@@ -363,27 +377,32 @@ const DataMatching = () => {
 
     setCsvCurrentData((prevData) => {
       const previousValue = prevData[key];
-
       if (matchedCoordinate?.fieldType === "questionsField") {
-        const validCharacters = templateHeaders?.typeOption?.split("-");
-        newValue = newValue.trim();
-        if (newValue.length !== 1 && newValue !== "") {
-          return prevData;
-        }
+        if (templateHeaders.isPermittedToEdit) {
+          const validCharacters = templateHeaders?.typeOption?.split("-");
+          newValue = newValue.trim();
 
-        // Check if newValue is in the list of valid characters or is an empty string
-        if (validCharacters.includes(newValue) || newValue === "") {
-          setModifiedKeys((prevKeys) => ({
-            ...prevKeys,
-            [key]: [newValue, previousValue],
-          }));
+          if (validCharacters.includes(newValue) || newValue === "") {
+            console.log("newValue1");
+            setModifiedKeys((prevKeys) => ({
+              ...prevKeys,
+              [key]: [newValue, previousValue],
+            }));
+
+            return {
+              ...prevData,
+              [key]: newValue,
+            };
+          } else {
+            return prevData;
+          }
+        } else {
+          toast.warning("You do not have permission to edit this field.");
 
           return {
             ...prevData,
-            [key]: newValue,
+            [key]: previousValue,
           };
-        } else {
-          return prevData;
         }
       } else {
         const csvHeader = csvData[0];
@@ -398,7 +417,8 @@ const DataMatching = () => {
         if (!currentFormData) {
           return prevData;
         }
-        const { dataFieldType, fieldLength, fieldRange } = currentFormData;
+
+        const { dataFieldType, fieldLength } = currentFormData;
         if (dataFieldType === "number") {
           if (!/^[0-9]+$/.test(newValue)) {
             return {
@@ -603,6 +623,7 @@ const DataMatching = () => {
       );
 
       setPopUp(true);
+      setConfirmationModal(false);
       toast.success("task complted successfully.");
     } catch (error) {
       toast.error(error.message);

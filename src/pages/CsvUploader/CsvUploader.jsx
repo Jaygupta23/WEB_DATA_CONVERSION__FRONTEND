@@ -199,7 +199,6 @@ const CsvUploader = () => {
         toast.warning("No image found.");
         return;
       }
-
       const data = response.data.template;
       const templateData = {
         templateData: {
@@ -208,6 +207,8 @@ const CsvUploader = () => {
           id: data.id,
           typeOption: data.typeOption,
           patternDefinition: data.patternDefinition,
+          blankDefination: data.blankDefination,
+          isPermittedToEdit: data.isPermittedToEdit,
         },
         metaData: [...data.templetedata],
       };
