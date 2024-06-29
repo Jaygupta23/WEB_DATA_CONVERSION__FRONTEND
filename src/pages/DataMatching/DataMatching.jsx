@@ -111,6 +111,21 @@ const DataMatching = () => {
 
   // Api for updating the csv data in the backend
   const onCsvUpdateHandler = async () => {
+    // const csvHeader = csvData[0];
+    // const formData = templateHeaders?.templetedata?.filter(
+    //   (data) => data.fieldType === "formField"
+    // );
+
+    // // Assuming you only want to match formFields and their attributes
+    // const filteredFormData = formData.filter((data) =>
+    //   Object.values(csvHeader).includes(data.attribute)
+    // );
+
+    // console.log(filteredFormData);
+    // console.log(csvHeader);
+    // // const { dataFieldType, fieldLength , fieldRange } = currentFormData;
+    // return;
+
     if (!modifiedKeys) {
       onImageHandler("next", currentIndex, csvData, currentTaskData);
       toast.success("Data updated successfully.");
@@ -205,6 +220,7 @@ const DataMatching = () => {
     }
   }, [csvData, currentTaskData, setCsvCurrentData, onCsvUpdateHandler]);
 
+  // Handle Key
   const handleKeyDownJump = (e, index) => {
     if (e.key === "Tab") {
       e.preventDefault();
@@ -580,6 +596,11 @@ const DataMatching = () => {
           },
         }
       );
+
+      if (response.data.length === 1) {
+        toast.warning("No matching data was found.");
+        return;
+      }
 
       setCsvData(response.data);
       let matchingIndex;
