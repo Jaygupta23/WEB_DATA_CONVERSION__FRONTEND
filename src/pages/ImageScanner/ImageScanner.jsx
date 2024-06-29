@@ -7,12 +7,12 @@ import axios from "axios";
 import dataContext from "../../Store/DataContext";
 import { REACT_APP_IP } from "../../services/common";
 import RemoveTemplate from "./RemoveTemplate";
-
 import TemplateData from "./TemplateData";
 import CoordinateData from "./CoordinateData";
 import OptionData from "./OptionData";
 import DynamicInput from "./DynamicInput";
-import ConfirmationTemplateSave from "./ConfirmationTemplateSave";
+import ConfirmationModal from "../../components/ConfirmationModal/ConfirmationModal";
+import Permissions from "./Permissions";
 
 const ImageScanner = () => {
   const [selection, setSelection] = useState(null);
@@ -33,6 +33,12 @@ const ImageScanner = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const dataCtx = useContext(dataContext);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [templatePermissions, setTemplatePermissions] = useState({
+    blankDefination: "",
+    patternDefinition: "",
+    isPermittedToEdit: false,
+  });
+  const [permissionModal, setPermissionModal] = useState(false);
   const [selectedCoordinateData, setSelectedCoordinateData] = useState(null);
   const [templateData, setTemplateData] = useState({
     name: "",
@@ -78,6 +84,15 @@ const ImageScanner = () => {
             ...prevState,
             name: dataCtx?.templateData?.templateData?.name,
             pageCount: dataCtx?.templateData?.templateData?.pageCount,
+          }));
+          setTemplatePermissions((prevState) => ({
+            ...prevState,
+            blankDefination:
+              dataCtx?.templateData?.templateData?.blankDefination,
+            patternDefinition:
+              dataCtx?.templateData?.templateData?.patternDefinition,
+            isPermittedToEdit:
+              dataCtx?.templateData?.templateData?.isPermittedToEdit,
           }));
           setSelectedCoordinates(selectedCoordinatesData);
         }
@@ -266,19 +281,20 @@ const ImageScanner = () => {
       });
       setSelectedCoordinates(updatedSelectedCoordinate);
     } else {
-      console.log(newObj);
       setSelectedCoordinates((prev) => [...prev, newObj]);
     }
-
+    console.log(selectType);
     setInputField("");
     setFieldType("");
-    setOpen(false);
     setLengthOfField("");
     setSelectType("");
     setQuestionRange({
       min: "",
       max: "",
     });
+    console.log(selectType);
+
+    setOpen(false);
     setSelectedCoordinateData(null);
     toast.success("Coordinate successfully added.");
   };
@@ -296,6 +312,12 @@ const ImageScanner = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+
+    if (!templatePermissions.patternDefinition) {
+      toast.error("Please select the pattern");
+      return;
+    }
+
     if (selectedCoordinates.length === 0) {
       toast.error("Please select the coordinates");
       return;
@@ -313,6 +335,7 @@ const ImageScanner = () => {
 
     let selectedValues = [];
     let characters = [];
+
     switch (selectedRow) {
       case "upper":
         characters = Array.from({ length: inputValues.length }, (_, index) =>
@@ -330,7 +353,9 @@ const ImageScanner = () => {
         );
         break;
       default:
-        characters = Array(inputValues.length).fill("");
+        characters = inputValues.map((value, index) =>
+          String.fromCharCode(65 + index)
+        );
         break;
     }
 
@@ -342,13 +367,26 @@ const ImageScanner = () => {
         selectedValues.push(item[selectedRow]);
       }
     });
-    const concatenatedString = selectedValues.join("-");
+
+    let concatenatedString = selectedValues.join("-");
+    if (!concatenatedString) {
+      if (selectedRow === "upper") {
+        concatenatedString = "A-B-C-D";
+      } else if (selectedRow === "lower") {
+        concatenatedString = "a-b-c-d";
+      } else if (selectedRow === "number") {
+        concatenatedString = "1-2-3-4";
+      }
+    }
 
     const data = {
       templateData: {
         name: templateData.name,
         pageCount: imageURL.length,
         typeOption: concatenatedString,
+        patternDefinition: templatePermissions.patternDefinition,
+        blankDefination: templatePermissions.blankDefination,
+        isPermittedToEdit: templatePermissions.isPermittedToEdit,
       },
       templateId: dataCtx?.templateData?.templateData?.id
         ? dataCtx?.templateData?.templateData?.id
@@ -382,6 +420,12 @@ const ImageScanner = () => {
       toast.success("Template created successfully!");
       dataCtx.modifyTemplateData(null);
       localStorage.removeItem("images");
+      setTemplatePermissions((prevState) => ({
+        ...prevState,
+        blankDefination: "",
+        patternDefinition: "",
+        isPermittedToEdit: false,
+      }));
       navigate("/imageuploader");
     } catch (error) {
       console.log(error);
@@ -450,7 +494,6 @@ const ImageScanner = () => {
       lower: "",
       number: "",
     }));
-
     setInputValues(newInputValues);
   };
 
@@ -514,6 +557,8 @@ const ImageScanner = () => {
             setTemplateData={setTemplateData}
             setOptionModel={setOptionModel}
             setConfirmationModal={setConfirmationModal}
+            setPermissionModal={setPermissionModal}
+            templatePermissions={templatePermissions}
           />
         </div>
       </div>
@@ -526,10 +571,19 @@ const ImageScanner = () => {
       />
 
       {/* Confirmation template saving COMPONENT  */}
-      <ConfirmationTemplateSave
+      <ConfirmationModal
         onSubmitHandler={onSubmitHandler}
         confirmationModal={confirmationModal}
         setConfirmationModal={setConfirmationModal}
+        heading={"Template Submission Confirmation"}
+        message={"Are you sure you want to submit the template?"}
+      />
+
+      <Permissions
+        permissionModal={permissionModal}
+        setPermissionModal={setPermissionModal}
+        templatePermissions={templatePermissions}
+        setTemplatePermissions={setTemplatePermissions}
       />
 
       {/* OPTION DATA MODEL AND FINAL SUBMIT */}
@@ -541,8 +595,10 @@ const ImageScanner = () => {
         setInputValues={setInputValues}
         createInputs={createInputs}
         handleCreateInputs={handleCreateInputs}
-        onSubmitHandler={onSubmitHandler}
+        setConfirmationModal={setConfirmationModal}
+        selectedRow={selectedRow}
       />
+
       {/* RIGHT SECTION  */}
       {!image ? (
         <div className="flex w-[75%] h-[100vh] justify-center items-center">
@@ -587,12 +643,16 @@ const ImageScanner = () => {
                       data-bs-toggle="modal"
                       data-bs-target="#exampleModal"
                     />
+
                     <>
                       {selectedCoordinates
                         .filter((data) => data.pageNo === currentImageIndex)
                         .map((data, index) => (
                           <div
                             key={index}
+                            onDoubleClick={() =>
+                              onEditCoordinateDataHanlder(data.fId)
+                            }
                             style={{
                               border: "3px solid #007bff",
                               position: "absolute",

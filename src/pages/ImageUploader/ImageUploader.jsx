@@ -3,11 +3,13 @@ import { useNavigate } from "react-router-dom";
 import uploadIcon from "../../assets/images/uploaderIcon.png";
 import { toast } from "react-toastify";
 import UTIF from "utif";
+import InstructionPage from "../../components/InstuctionPage/InstructionPage";
 
 const ImageUploader = () => {
   const [images, setImages] = useState([]);
   const [imageNames, setImageNames] = useState([]);
   const [openUpload, setOpenUpload] = useState(true);
+  const [instruction, setInstuction] = useState(false);
   const navigate = useNavigate();
 
   // Function to handle image selection
@@ -103,6 +105,7 @@ const ImageUploader = () => {
   };
 
   const handleFinalSubmit = () => {
+    setInstuction(false);
     if (images.length === 0) {
       toast.warning("Please select the images.");
       return;
@@ -160,14 +163,20 @@ const ImageUploader = () => {
 
             <div className="mt-8 flex justify-center">
               <button
-                onClick={handleFinalSubmit}
-                className="bg-teal-600 font-medium text-white px-4 py-3 rounded-3xl text-center"
+                onClick={() => setInstuction(true)}
+                className="bg-gradient-to-r from-teal-500 to-teal-600 hover:bg-teal-700 text-white font-medium px-6 py-3 rounded-full shadow-md focus:outline-none transform transition-transform duration-300 hover:scale-105"
               >
-                Submit All Images
+                Save
               </button>
             </div>
           </div>
         </div>
+
+        <InstructionPage
+          setInstuction={setInstuction}
+          instruction={instruction}
+          handleFinalSubmit={handleFinalSubmit}
+        />
       </section>
     </div>
   );

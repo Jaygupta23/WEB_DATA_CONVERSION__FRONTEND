@@ -190,7 +190,7 @@ const AdminAssined = () => {
   };
 
   const onDownloadHandler = async (currentTaskData) => {
-    if (!currentTaskData.blankTaskStatus || !currentTaskData.multTaskStatus) {
+    if (!currentTaskData.taskStatus) {
       toast.warning("The task is pending, so downloading is not available.");
       return;
     }
@@ -242,7 +242,7 @@ const AdminAssined = () => {
     try {
       await axios.post(
         `http://${REACT_APP_IP}:4000/taskupdation/${parseInt(currentTask.id)}`,
-        { blankTaskStatus: false, multTaskStatus: false },
+        { taskStatus: false },
         {
           headers: {
             token: token,
@@ -251,7 +251,7 @@ const AdminAssined = () => {
       );
       const updatedTasks = matchingTask.map((task) => {
         if (task.id === currentTask.id) {
-          return { ...task, blankTaskStatus: false, multTaskStatus: false };
+          return { ...task, taskStatus: false };
         }
         return task;
       });
@@ -264,6 +264,11 @@ const AdminAssined = () => {
   };
 
   const onEditTaskHandler = async (user) => {
+    if (!user) {
+      toast.warning("Please select the user.");
+      return;
+    }
+
     try {
       const token = JSON.parse(localStorage.getItem("userData"));
       await axios.post(
@@ -277,14 +282,12 @@ const AdminAssined = () => {
       );
 
       const updatedTasks = matchingTask.map((task) => {
-        if (task.userId === user.id && task.id === taskEditId) {
-          console.log(task.userName + " ---- > " + user.userName);
-          const taksDa = {
+        if (task.id == taskEditId) {
+          const taskData = {
             ...task,
             userName: user.userName,
           };
-          console.log(taksDa);
-          return taksDa;
+          return taskData;
         }
         return task;
       });
@@ -315,36 +318,33 @@ const AdminAssined = () => {
                   <div className="min-w-full divide-y divide-gray-200">
                     <div className="bg-gray-50">
                       <div className="flex ">
-                        <div className="py-3.5 text-xl text-center font-semibold text-gray-700 w-[150px]">
+                        <div className="py-3 text text-center font-semibold text-gray-700 w-[100px]">
                           Template
                         </div>
-                        <div className="py-3.5 text-center text-xl font-semibold text-gray-700 w-[150px]">
+                        <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
                           Assignee.
                         </div>
-                        <div className="py-3.5 text-center text-xl font-semibold text-gray-700 w-[80px]">
+                        <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
                           Min
                         </div>
-                        <div className="py-3.5 text-center text-xl font-semibold text-gray-700 w-[80px]">
+                        <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
                           Max
                         </div>
-                        <div className="py-3.5 text-center text-xl font-semibold text-gray-700 w-[150px]">
+                        <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
                           Module Type
                         </div>
-                        <div className="py-3.5 text-center text-xl font-semibold text-gray-700 w-[150px]">
+                        <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
                           Status
                         </div>
-                        <div className="py-3.5 text-center text-xl font-semibold text-gray-700 w-[150px]">
+                        <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
                           Re-Assign
                         </div>
-                        <div className="py-3.5 text-center text-xl font-semibold text-gray-700 w-[150px]">
+                        <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
                           Download
                         </div>
-                        <div className="py-3.5 text-center text-xl font-semibold text-gray-700 w-[150px]">
+                        <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
                           Edit
                         </div>
-                        {/* <div className="py-3.5 text-center text-xl font-semibold text-gray-700 w-[150px]">
-                          Remove
-                        </div> */}
                       </div>
                     </div>
                     <div className="divide-y divide-gray-200 bg-white overflow-y-auto h-[250px]">

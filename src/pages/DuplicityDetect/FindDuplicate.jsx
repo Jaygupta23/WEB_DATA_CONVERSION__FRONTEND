@@ -1,10 +1,10 @@
 import React from "react";
 
 const FindDuplicate = ({
-  onDuplicateCheckedHandler,
   csvHeaders,
   imageNames,
   onFindDuplicatesHandler,
+  onDuplicateCheckedHandler,
 }) => {
   return (
     <div className="flex justify-center items-center w-[100%] pt-20 h-[100vh]">

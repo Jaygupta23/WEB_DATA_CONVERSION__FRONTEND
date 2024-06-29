@@ -4,6 +4,7 @@ const ConfirmationTemplateSave = ({
   confirmationModal,
   onSubmitHandler,
   setConfirmationModal,
+
 }) => {
   return (
     <div>
@@ -49,11 +50,12 @@ const ConfirmationTemplateSave = ({
                       className="text-lg font-medium text-gray-900"
                       id="modal-title"
                     >
-                      Template Saved
+                      Confirm Task Completion
                     </h3>
                     <div className="mt-2">
                       <p className="text-sm text-gray-500">
-                        Your template has been successfully saved.
+                        Please confirm if you would like to mark this task as
+                        complete.
                       </p>
                     </div>
                   </div>

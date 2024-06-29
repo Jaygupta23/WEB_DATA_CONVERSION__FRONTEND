@@ -1,11 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 const UserTaskAssined = ({
   onCompareTaskStartHandler,
   allTasks,
-  onDataTypeSelectHandler,
   compareTask,
+  onTaskStartHandler,
+  setCurrentTaskData,
 }) => {
+  const [loadingTaskId, setLoadingTaskId] = useState(null);
+
+  const handleStartClick = (taskData) => {
+    if (taskData?.taskStatus) {
+      toast.warning("Task is already completed.");
+      return;
+    }
+
+    setLoadingTaskId(taskData.id);
+    onTaskStartHandler(taskData);
+    setCurrentTaskData(taskData);
+    setTimeout(() => setLoadingTaskId(null), 3000);
+  };
+
   return (
     <div className="h-[100vh] flex justify-center bg-gradient-to-r from-blue-700 to-purple-700  items-center templatemapping pt-20">
       <div className="">
@@ -46,7 +62,7 @@ const UserTaskAssined = ({
                       </div>
                     </div>
                     <div className="divide-y divide-gray-200 bg-white overflow-y-auto max-h-[300px]">
-                      {allTasks?.map((taskData, index) => (
+                      {allTasks?.map((taskData) => (
                         <>
                           <div key={taskData.id} className="flex  py-2 w-full">
                             <div className="whitespace-nowrap w-[150px] px-4">
@@ -75,14 +91,12 @@ const UserTaskAssined = ({
                               <div className="text-md text-center">
                                 <span
                                   className={`inline-flex items-center justify-center rounded-full ${
-                                    !taskData.blankTaskStatus ||
-                                    !taskData.multTaskStatus
+                                    !taskData.taskStatus
                                       ? "bg-amber-100 text-amber-700"
                                       : "bg-emerald-100 text-emerald-700"
                                   } px-2.5 py-0.5 `}
                                 >
-                                  {!taskData.blankTaskStatus ||
-                                  !taskData.multTaskStatus ? (
+                                  {!taskData.taskStatus ? (
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"
                                       fill="none"
@@ -114,22 +128,35 @@ const UserTaskAssined = ({
                                     </svg>
                                   )}
                                   <p className="whitespace-nowrap text-sm">
-                                    {taskData.blankTaskStatus &&
-                                    taskData.multTaskStatus
+                                    {taskData.taskStatus
                                       ? "Completed"
                                       : "Pending"}
                                   </p>
                                 </span>
                               </div>
                             </div>
-                            <div className="whitespace-nowrap text-center w-[150px] px-4">
+                            <div
+                              className="whitespace-nowrap text-center w-[150px] px-4"
+                              key={taskData.id}
+                            >
                               <button
-                                onClick={() =>
-                                  onDataTypeSelectHandler(taskData)
-                                }
-                                className="rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white"
+                                onClick={() => handleStartClick(taskData)}
+                                type="button"
+                                disabled={loadingTaskId === taskData.id}
+                                className={`rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white ${
+                                  loadingTaskId === taskData.id
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                                }`}
                               >
-                                Start
+                                {loadingTaskId === taskData.id ? (
+                                  <div className="flex items-center justify-center">
+                                    <span className="mr-2">Loading...</span>
+                                    <div className="animate-spin rounded-full border-b-2 border-white"></div>
+                                  </div>
+                                ) : (
+                                  "Start"
+                                )}
                               </button>
                             </div>
                           </div>

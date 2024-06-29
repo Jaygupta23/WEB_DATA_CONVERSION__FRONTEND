@@ -43,7 +43,9 @@ const FormDataSection = ({
                                         (csvCurrentData[key] &&
                                           typeof csvCurrentData[key] ===
                                             "string" &&
-                                          (csvCurrentData[key].includes("*") ||
+                                          (csvCurrentData[key].includes(
+                                            templateHeaders?.patternDefinition
+                                          ) ||
                                             csvCurrentData[key].includes(" ")))
                                           ? "bg-red-500 text-white"
                                           : "bg-white"

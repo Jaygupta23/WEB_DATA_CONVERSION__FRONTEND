@@ -63,7 +63,7 @@ const UploadSection = ({
                 <p
                   key={template.id}
                   onClick={() => setSelectedId(template.id)}
-                  className={`group flex items-center justify-between w-full mt-2 rounded-lg px-4 py-2  text-black ${
+                  className={`group flex items-center justify-between w-ful cursor-pointer mt-2 rounded-lg px-4 py-2  text-black ${
                     selectedId === template.id ? "bg-blue-100" : ""
                   }`}
                 >

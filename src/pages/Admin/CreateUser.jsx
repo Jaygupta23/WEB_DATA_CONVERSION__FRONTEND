@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { REACT_APP_IP } from "../../services/common";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const CreateUser = () => {
   const [userData, setUserData] = useState({
@@ -19,7 +20,9 @@ const CreateUser = () => {
       createTemplate: false,
     },
   });
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
@@ -60,11 +63,6 @@ const CreateUser = () => {
     }
   };
 
-  // const validateMobile = (value) => {
-  //   const regex = /^\d{10}$/;
-  //   return regex.test(value);
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -75,7 +73,8 @@ const CreateUser = () => {
       !userData.userName ||
       !userData.mobile ||
       !userData.email ||
-      !userData.password
+      !userData.password ||
+      !confirmPassword
     ) {
       return toast.error("plzz select All fields", {
         position: "bottom-right",
@@ -88,9 +87,17 @@ const CreateUser = () => {
       });
     }
 
-    // if (!validateMobile(userData.mobile)) {
-    //   return toast.error("Invalid mobile number:", userData.mobile);
-    // }
+    if (userData.password !== confirmPassword) {
+      return toast.error("Password mismatch", {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+      });
+    }
 
     const { permissions } = userData;
     const isAnyPermissionTrue = Object.values(permissions).some(
@@ -155,6 +162,7 @@ const CreateUser = () => {
     }
   };
 
+
   return (
     <div className="flex justify-center items-center bg-gradient-to-r from-blue-400 to-blue-600 h-[100vh] pt-20">
       <div className="max-w-2xl mx-auto shadow-lg rounded-3xl py-8 px-16 bg-gray-50">
@@ -216,21 +224,62 @@ const CreateUser = () => {
             />
           </div>
           <div className="flex flex-col sm:flex-row sm:space-x-10 w-full">
-            <div className="w-full">
+            <div className="w-full mb-4">
               <label htmlFor="password" className="block text-lg font-medium">
                 Password
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Enter Password"
-                required
-                value={userData?.password}
-                onChange={handleChange}
-                className="mt-2 px-4 py-2 shadow-md shadow-blue-100 focus:ring-indigo-500 focus:border-indigo-500 block w-full  sm:text-sm border-gray-300 rounded-md"
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter Password"
+                  required
+                  value={userData?.password}
+                  onChange={handleChange}
+                  className="mt-2 px-4 py-2 shadow-md shadow-blue-100 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                />
+                <div
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer"
+                  onClick={() => {
+                    setShowPassword(!showPassword);
+                  }}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </div>
+              </div>
             </div>
+
+            <div className="w-full mt-4 sm:mt-0">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-lg font-medium"
+              >
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Confirm Password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="mt-2 px-4 py-2 shadow-md shadow-blue-100 focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                />
+                <div
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer"
+                  onClick={() => {
+                    setShowConfirmPassword(!showConfirmPassword);
+                  }}
+                >
+                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:space-x-10 w-full">
             <div className="w-full mt-4  sm:mt-0">
               <label className="block text-lg font-medium">Role</label>
               <select
@@ -250,7 +299,6 @@ const CreateUser = () => {
               </select>
             </div>
           </div>
-
           <div>
             <label className="block text-lg font-medium">Permissions</label>
             <div className="flex flex-wrap justify-start gap-x-14 w-full mt-2">

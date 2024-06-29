@@ -80,6 +80,7 @@ const TemplateMapping = () => {
       const newMin = parseInt(min);
       const newMax = parseInt(max);
       // Loop through all headers
+
       Object.keys(selectedAssociations).forEach((header) => {
         const questionNumber = parseInt(header.replace(/\D/g, ""));
         if (questionNumber >= newMin && questionNumber <= newMax) {
@@ -91,7 +92,6 @@ const TemplateMapping = () => {
     } else {
       updatedAssociations[csvHeader] = templateHeader;
     }
-
     // Ensure all headers are included in updatedAssociations
     csvHeaders.forEach((header) => {
       if (!(header in updatedAssociations)) {
@@ -140,7 +140,7 @@ const TemplateMapping = () => {
         }
       );
       toast.success("Mapping successfully done.");
-      navigate(`/csvuploader/taskAssign/${id}`);
+      navigate(`/csvuploader/fieldDecision/${id}`);
     } catch (error) {
       toast.error(error.message);
     }

@@ -181,7 +181,7 @@ const DataProvider = (props) => {
   };
 
   const modifyTemplateDataHandler = (templateData) => {
-    console.log("templateData saving", templateData);
+
     setDataState((item) => {
       return {
         ...item,
