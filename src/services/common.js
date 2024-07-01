@@ -7,7 +7,6 @@ export const REACT_APP_IP = "localhost";
 
 export const onGetTemplateHandler = async () => {
   const token = JSON.parse(localStorage.getItem("userData"));
-
   try {
     const response = await axios.post(
       `http://${REACT_APP_IP}:4000/get/templetes`,
@@ -60,7 +59,7 @@ export const onGetVerifiedUserHandler = async () => {
     );
 
     return response.data;
-  } catch (error) {}
+  } catch (error) { }
 };
 
 export const onGetAllTasksHandler = async () => {
@@ -95,5 +94,24 @@ export const onGetTaskHandler = async (id) => {
     return response.data;
   } catch (error) {
     toast.error(error.message);
+  }
+};
+
+
+export const fetchFilesAssociatedWithTemplate = async (templateId) => {
+  const token = JSON.parse(localStorage.getItem("userData"));
+
+  try {
+    const response = await axios.post(
+      `http://${REACT_APP_IP}:4000/getFileForTemplate/${templateId}`,
+      {
+        headers: {
+          token: token,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
   }
 };

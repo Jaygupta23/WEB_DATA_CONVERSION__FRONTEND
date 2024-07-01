@@ -1,7 +1,10 @@
 import React, { useState, useContext, useEffect } from "react";
 import Select from "react-select";
 import dataContext from "../Store/DataContext";
-import { onGetTemplateHandler } from "../services/common";
+import {
+  onGetTemplateHandler,
+  fetchFilesAssociatedWithTemplate,
+} from "../services/common";
 
 const NewSelect = (props) => {
   const [selectValue, setSelectValue] = useState("");
@@ -9,26 +12,34 @@ const NewSelect = (props) => {
   const dataCtx = useContext(dataContext);
 
   useEffect(() => {
-    if (props.label === "Select Template") {
-      fetchData();
-    } else if (props.label === "Select Files") {
-      setOptions(
-        dataCtx.csvHeader.map((item) => ({ label: item, value: item }))
-      );
-    }
-
-    async function fetchData() {
+    const fetchData = async () => {
       const response = await onGetTemplateHandler();
       const options = response.map((item) => ({
         label: item.name,
         value: item.id,
       }));
       setOptions(options);
+    };
+    const fetchFile = async (templateName) => {
+      const response = await fetchFilesAssociatedWithTemplate(templateName);
+      const options = response.map((item) => ({
+        label: item.name,
+        value: item.id,
+      }));
+      setOptions(options);
+    };
+    if (props.label === "Select Template") {
+      fetchData();
+    } else if (props.label === "Select Files") {
+      if (selectValue) {
+        fetchFile(selectValue);
+      }
     }
-  }, [props.label, dataCtx.csvHeader]);
+  }, [props.label, dataCtx.csvHeader, selectValue]);
 
   const handleChange = (selectedOption) => {
     setSelectValue(selectedOption);
+
     if (props.label === "Select Image Column") {
       dataCtx.setImageColName(selectedOption.value);
     } else if (props.label === "Select Primary Key") {
