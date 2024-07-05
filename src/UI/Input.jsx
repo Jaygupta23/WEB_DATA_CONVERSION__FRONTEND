@@ -4,7 +4,7 @@ import { useContext } from "react";
 import dataContext from "../Store/DataContext";
 import Papa from "papaparse";
 import extractImagesFromZip from "../services/imageextractor";
-const Input = (props) => {
+const   Input = (props) => {
   const datactx = useContext(dataContext);
   const fileHandler = (event) => {
     const file = event.target.files[0];
@@ -77,13 +77,13 @@ const Input = (props) => {
   return (
     <>
       <div className="grid w-full  items-center gap-1.5">
-        <label className="text-sm text-gray-600 font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+        <label className="text-sm text-white font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           {props.label}
         </label>
         <input
           id="picture"
           type="file"
-          className="flex h-10 w-full rounded-md border  bg-white px-3 py-2 text-sm text-gray-400 file:border-0 file:bg-transparent file:text-gray-600 file:text-sm file:font-medium   border-black-400 hover:border-blue-400"
+          className="flex h-10 w-full rounded-md border  bg-white px-3 py-2 text-sm text-gray-400 file:border-0 file:text-white file:rounded-sm file:bg-gray-500  file:text-sm file:font-medium   border-black-400 hover:border-blue-400"
           onChange={fileHandler}
           accept={props.type}
         />

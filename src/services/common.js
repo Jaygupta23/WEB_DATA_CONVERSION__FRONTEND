@@ -102,11 +102,10 @@ export const fetchFilesAssociatedWithTemplate = async (templateId) => {
   const token = JSON.parse(localStorage.getItem("userData"));
 
   try {
-    const response = await axios.post(
-      `http://${REACT_APP_IP}:4000/getFileForTemplate/${templateId}`,
+    const response = await axios.post(`http://${REACT_APP_IP}:4000/getUploadedFiles/${templateId}`,
       {
         headers: {
-          token: token,
+          token: token, 
         },
       }
     );

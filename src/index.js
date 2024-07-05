@@ -6,10 +6,9 @@ import "animate.css";
 import { ToastContainer } from "react-toastify";
 import reportWebVitals from "./reportWebVitals";
 import DataProvider from "./Store/DataProvider.jsx";
-// Import Syncfusion licensing API
-// Import Syncfusion CSS
-import '@syncfusion/ej2-base/styles/material.css';
-import '@syncfusion/ej2-react-grids/styles/material.css';
+
+// import '@syncfusion/ej2-base/styles/material.css';
+// import '@syncfusion/ej2-react-grids/styles/material.css';
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>

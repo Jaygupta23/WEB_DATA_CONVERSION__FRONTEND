@@ -14,11 +14,11 @@ const Customselect = (props) => {
     if (props.label === "Select Image Column") {
       dataCtx.setImageColName(selectValue); //taking time to select option
     } else {
-      console.log("primary col trigerred");
+      // console.log("primary col trigerred");
       dataCtx.addToPrimaryKey(selectValue); //taking time to select option how can i improve ??
     }
   }, [selectValue]);
-  console.log(dataCtx.csvHeader);
+  // console.log(dataCtx.csvHeader);
   const arr = dataCtx.csvHeader.map((item, index) => {
     return (
       <MenuItem key={index} value={item}>
@@ -59,7 +59,15 @@ const Customselect = (props) => {
     <FormControl required sx={{ width: "100%" }}>
       <InputLabel
         id="demo-simple-select-required-label"
-        sx={{ color: "white" }} // Set label text color to white
+        className="text-white"
+        sx={{
+          color: "white",
+          "&.Mui-focused": {
+            color: "white",
+            bordero:"orange" // Ensure the label color remains white when focused
+          },
+         
+        }} // Set label text color to white
       >
         {props.label}
       </InputLabel>
@@ -107,7 +115,7 @@ const Customselect = (props) => {
         )}
         {dataCtx.csvHeader.length !== 0 && arr}
       </Select>
-      <FormHelperText sx={{ color: "white" }}>Required</FormHelperText>{" "}
+      <FormHelperText sx={{ color: "orange" }}>Required*</FormHelperText>{" "}
       {/* Set helper text color to white */}
     </FormControl>
   );
