@@ -1,22 +1,22 @@
 import React from "react";
 
-const   ImageSection = ({
+const   ImageSectionCSV = ({
   imageContainerRef,
   currentImageIndex,
   imageUrls,
   imageRef,
+  correctionData,
   zoomLevel,
   selectedCoordintes,
   templateHeaders,
 }) => {
-  console.log(imageUrls)
   return (
     <div
       ref={imageContainerRef} 
       className="mx-auto bg-white"
       style={{
         position: "relative",
-        border: "2px solid gray",
+        border: "2px solid gray", 
         width: "48rem",
         height: "23rem",
         overflow: "auto",
@@ -24,7 +24,7 @@ const   ImageSection = ({
       }}
     >
       <img
-        src={`data:image/jpeg;base64,${imageUrls[currentImageIndex]?.base64Image}`}
+        src={`http:\\\\localhost:4000\\images\\${correctionData?.imageDirectoryPath}\\${correctionData?.previousData.IMAGE_NAME}`}
         alt="Selected"
         ref={imageRef}
         style={{
@@ -59,4 +59,4 @@ const   ImageSection = ({
   );
 };
 
-export default ImageSection;
+export default ImageSectionCSV;

@@ -56,10 +56,8 @@ const CsvUploader = () => {
         const response = await onGetTemplateHandler();
         const user = await onGetVerifiedUserHandler();
         setCurrentUser(user.user);
-        const csvTemplates = response.filter(
-          (data) => data.TempleteType === "Data Entry"
-        );
-        setAllTemplates(csvTemplates);
+        
+        setAllTemplates(response);
       } catch (error) {
         console.log(error);
       }

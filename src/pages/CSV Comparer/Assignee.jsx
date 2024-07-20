@@ -9,6 +9,7 @@ import {
 import { REACT_APP_IP } from "../../services/common";
 import axios from "axios";
 import classes from "./Assignee.module.css";
+import { useParams } from "react-router-dom";
 const Assignee = () => {
   const [showModal, setShowModal] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState([]);
@@ -23,8 +24,10 @@ const Assignee = () => {
   const navigate = useNavigate();
   const token = JSON.parse(localStorage.getItem("userData"));
   const location = useLocation();
+  const { id } = useParams();
   const [templateName, setTemplateName] = useState("");
   const state = location.state;
+  // console.log(state)    
   useEffect(() => {
     const input = document.getElementById("templateInputName");
     input.focus();
@@ -44,6 +47,15 @@ const Assignee = () => {
       e.returnValue = confirmationMessage;
       return confirmationMessage;
     };
+    // useEffect(() => {
+    //   const fetchData = async () => {
+    //     try {
+
+    //     } catch (error) {
+
+    //     }
+    //   }
+    // })
 
     // Add event listener when the component mounts
     window.addEventListener("beforeunload", confirmExit);
@@ -58,6 +70,7 @@ const Assignee = () => {
     const fetchUsers = async () => {
       try {
         const response = await onGetAllUsersHandler();
+
         setAllUsers(response.users);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -78,6 +91,14 @@ const Assignee = () => {
     };
     fetchUsers();
   }, [selectedUser]);
+
+  // useEffect(() => {
+  //   const fetchFile = async () => {
+  //     try {
+  //       const task = await onGetTaskHandler
+  //     } catch (error) {}
+  //   };
+  // }, []);
 
   const onTaskAssignedHandler = () => {
     const input = document.getElementById("templateInputName");
@@ -101,19 +122,21 @@ const Assignee = () => {
       toast.warning("Please select the assignee!");
       return;
     }
-
+// console.log(id,"id")
     const newAssignedTask = {
       userId: selectedUser.userId,
       min: taskValue.min,
       max: taskValue.max,
       userName: selectedUser.userName,
-      templeteId: 0,
-      fileId: 0,
+      templeteId: id,
+      fileId: dataCtx.fileId,
+      csvFilePath:location.state.csvFile,
       correctedFilePath: location.state.correctedFilePath,
       errorFilePath: location.state.errorFilePath,
       imageDirectoryPath: location.state.imageDirectoryName,
       moduleType: "CSV Compare",
     };
+
     setAssignedUsers([...assignedUsers, newAssignedTask]);
 
     let newMinValue = parseInt(taskValue.max) + 1;
@@ -123,7 +146,7 @@ const Assignee = () => {
     setTaskValue({ ...taskValue, min: newMinValue, max: "" });
     toast.success("Task successfully assigned. Thank you.");
   };
-
+  // console.log(dataCtx.fileId)
   const onTaskSubmitHandler = async () => {
     try {
       await axios.post(
@@ -145,10 +168,10 @@ const Assignee = () => {
   };
 
   return (
-    <div className={`min-h-[100vh] flex justify-center ${classes.correction}`}>
-      <div className=" mt-40 w-full">
+    <div className={`min-h-[100vh] flex justify-center items-center ${classes.correction} bg-blue-500`}>
+      <div className=" mt-20 w-full">
         {/* MAIN SECTION  */}
-        <section className="mx-auto w-full max-w-7xl  px-12 py-10 bg-white rounded-xl">
+        <section className="mx-auto w-full max-w-7xl  px-12 py-6 bg-white rounded-xl">
           <div className="flex flex-col space-y-4  md:flex-row md:items-center md:justify-between md:space-y-0">
             <div>
               <h2 className="text-3xl font-semibold">Assign Tasks</h2>
@@ -157,10 +180,10 @@ const Assignee = () => {
               <div className="flex items-start sm:gap-8">
                 <div className="flex gap-3">
                   <h1 className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white">
-                    Total Data - {state && location.state.data.length}
+                    Total Errors Rows - {state && location.state.data.length}
                   </h1>
                   <h1 className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white">
-                    Remaining Data -{" "}
+                    Remaining Errors Rows -{" "}
                     {state && location.state.data.length - taskValue.min + 1}
                   </h1>
                 </div>
@@ -198,7 +221,7 @@ const Assignee = () => {
                           scope="col"
                           className="px-12 py-3.5 text-left text-xl font-semibold text-gray-700"
                         >
-                          <span>Template Name</span>
+                          <span>Task Name</span>
                         </th>
 
                         <th scope="col" className="relative px-4 py-3.5">
@@ -219,6 +242,7 @@ const Assignee = () => {
                                   if (currentUser.id !== user.id) {
                                     return (
                                       <button
+                                        key={i}
                                         onClick={() =>
                                           setSelectedUser({
                                             ...selectedUser,
@@ -306,11 +330,11 @@ const Assignee = () => {
           {/* MODEL SECTION  */}
           <div className="flex flex-row justify-between">
             <div className=" bg-white rounded-md p-6 shadow-md">
-              <label className="block mb-2">Template Name</label>
+              <label className="block mb-2">Task Name</label>
               <input
                 type="text"
                 id="templateInputName"
-                placeholder="Enter template name"
+                placeholder="Enter Task name"
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-400"
                 onChange={(e) => {
                   setTemplateName(e.target.value);

@@ -5,6 +5,7 @@ const UserTaskAssined = ({
   onCompareTaskStartHandler,
   allTasks,
   compareTask,
+  csvData,
   onTaskStartHandler,
   setCurrentTaskData,
 }) => {
@@ -40,7 +41,7 @@ const UserTaskAssined = ({
                     <div className="bg-gray-50 w-full">
                       <div className="flex">
                         <div className=" py-3.5 px-4 text-center text-xl font-semibold text-gray-700 w-[150px]">
-                          <span>Templates</span>
+                          <span>Task Name</span>
                         </div>
 
                         <div className=" py-3.5 px-4 text-center  text-xl font-semibold text-gray-700 w-[100px]">
@@ -63,8 +64,8 @@ const UserTaskAssined = ({
                     </div>
                     <div className="divide-y divide-gray-200 bg-white overflow-y-auto max-h-[300px]">
                       {allTasks?.map((taskData) => (
-                        <>
-                          <div key={taskData.id} className="flex  py-2 w-full">
+                        <div key={taskData.id}>
+                          <div  className="flex  py-2 w-full">
                             <div className="whitespace-nowrap w-[150px] px-4">
                               <div className="text-md text-center">
                                 {taskData.templateName}
@@ -140,7 +141,10 @@ const UserTaskAssined = ({
                               key={taskData.id}
                             >
                               <button
-                                onClick={() => handleStartClick(taskData)}
+                              onClick={() => {
+                                console.log(taskData);
+                                handleStartClick(taskData);
+                            }}
                                 type="button"
                                 disabled={loadingTaskId === taskData.id}
                                 className={`rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white ${
@@ -160,39 +164,39 @@ const UserTaskAssined = ({
                               </button>
                             </div>
                           </div>
-                        </>
+                        </div>
                       ))}
                       {compareTask?.map((taskData, index) => (
                         <div
                           key={taskData.id}
-                          className="grid grid-cols-7 gap-x-6 py-2"
+                          className="flex w-full py-2"
                         >
-                          <div className="whitespace-nowrap w-1/6">
+                          <div className="whitespace-nowrap w-[150px] px-4">
                             <div className="text-md text-center">
-                              {taskData.templateName}
+                              {taskData.taskName}
                             </div>
                           </div>
-                          <div className="whitespace-nowrap  w-1/6">
+                          <div className="whitespace-nowrap  w-[100px] px-4">
                             <div className="text-md text-center">
                               {taskData.min}
                             </div>
                           </div>
-                          <div className="whitespace-nowrap w-1/6">
+                          <div className="whitespace-nowrap w-[100px] px-4">
                             <div className="text-md text-center">
                               {taskData.max}
                             </div>
                           </div>
 
-                          <div className="whitespace-nowrap w-1/6">
+                          <div className="whitespace-nowrap w-[150px] px-4">
                             <div className="text-md text-center font-semibold py-1 border-2">
                               {taskData.moduleType}
                             </div>
                           </div>
 
-                          <div className="whitespace-nowrap w-1/6">
+                          <div className="whitespace-nowrap w-[150px] px-4">
                             <div className="text-md text-center">
                               <span
-                                className={`inline-flex items-center justify-center rounded-full ${
+                                className={`inline-flex items-center justify-center rounded-full  ${
                                   !taskData.taskStatus
                                     ? "bg-amber-100 text-amber-700"
                                     : "bg-emerald-100 text-emerald-700"
@@ -238,14 +242,25 @@ const UserTaskAssined = ({
                               </span>
                             </div>
                           </div>
-                          <div className="whitespace-nowrap text-center w-1/6">
+                          <div className="whitespace-nowrap text-center w-[150px] px-4">
                             <button
                               onClick={() =>
                                 onCompareTaskStartHandler(taskData)
                               }
-                              className="rounded border border-indigo-500 bg-indigo-500 px-10 py-1 font-semibold text-white"
+                              className={`rounded-3xl border border-indigo-500 bg-indigo-500 px-6 py-1 font-semibold text-white ${
+                                  loadingTaskId === taskData.id
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                                }`}
                             >
-                              Start
+                               {loadingTaskId === taskData.id ? (
+                                  <div className="flex items-center justify-center">
+                                    <span className="mr-2">Loading...</span>
+                                    <div className="animate-spin rounded-full border-b-2 border-white"></div>
+                                  </div>
+                                ) : (
+                                  "Start"
+                                )}
                             </button>
                           </div>
                         </div>

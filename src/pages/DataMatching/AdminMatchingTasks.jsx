@@ -9,6 +9,7 @@ const AdminMatchingTasks = ({
   setTaskEdit,
   setTaskEditId,
 }) => {
+  // console.log(matchingTask)
   return (
     <div>
       {matchingTask?.map((taskData) => (
@@ -25,8 +26,8 @@ const AdminMatchingTasks = ({
           <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-md text-center">{taskData.max}</div>
           </div>
-          <div className="whitespace-nowrap w-[100px] py-2">
-            <div className="text-md text-center border-2 ">
+          <div className="whitespace-nowrap w-[150px] py-2">
+            <div className="text-md text-center font-semibold border-2 py-1 ">
               {taskData.moduleType}
             </div>
           </div>

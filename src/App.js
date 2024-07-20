@@ -24,6 +24,7 @@ import DuplicityDetect from "./pages/DuplicityDetect/DuplicityDetect";
 import UserDetail from "./pages/Admin/UserDetail";
 import UpdatedDetails from "./pages/Admin/UpdatedDetails";
 import FieldDecision from "./pages/FieldDecision/FieldDecision";
+import UserCorrectionData from "./pages/CSV Comparer/UserCorrectionData";
 
 function App() {
   const datactx = useContext(dataContext);
@@ -72,7 +73,7 @@ function App() {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/comparecsv" element={<CsvHomepage />} />
                   <Route
-                    path="/comparecsv/assign_operator"
+                    path="/comparecsv/assign_operator/:id"
                     element={<Assignee />}
                   />
                 </>
@@ -85,9 +86,13 @@ function App() {
                 <>
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/datamatching" element={<DataMatching />} />
-                  <Route
+                  {/* <Route
                     path="datamatching/correct_compare_csv"
                     element={<Correction />}
+                  /> */}
+                  <Route
+                    path="datamatching/correct_compare_csv"
+                    element={<UserCorrectionData />}
                   />
                 </>
               )}

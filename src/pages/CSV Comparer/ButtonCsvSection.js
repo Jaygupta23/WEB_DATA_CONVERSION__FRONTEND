@@ -1,6 +1,6 @@
 import React from "react";
 
-const ButtonSection = ({
+const ButtonCsvSection = ({
   currentIndex,
   csvData,
   max,
@@ -11,10 +11,11 @@ const ButtonSection = ({
   currentImageIndex,
   imageUrls,
 }) => {
+
   return (
     <div className="flex justify-between ">
       <h3 className="px-5 text-lg font-semibold py-3 text-white">
-        Data No : {currentIndex} out of {csvData.length-1}
+        Data No : {currentIndex} out of {max}
       </h3>
       <div className="flex justify-center my-3">
         <button
@@ -38,11 +39,10 @@ const ButtonSection = ({
         </button>
       </div>
       <h3 className=" text-lg font-semibold py-3 text-white px-4">
-        {" "}
-        Image : {currentImageIndex + 1} Out of {imageUrls.length}
+        Image Name - {correctionData?.previousData?.IMAGE_NAME}
       </h3>
     </div>
   );
 };
 
-export default ButtonSection;
+export default ButtonCsvSection;

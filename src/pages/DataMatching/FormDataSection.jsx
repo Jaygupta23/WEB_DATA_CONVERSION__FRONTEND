@@ -11,6 +11,8 @@ const FormDataSection = ({
   changeCurrentCsvDataHandler,
   imageFocusHandler,
 }) => {
+
+
   return (
     <div className=" border-e lg:w-3/12 xl:w-[20%] order-lg-1 ">
       <div className="overflow-hidden w-[100%] ">

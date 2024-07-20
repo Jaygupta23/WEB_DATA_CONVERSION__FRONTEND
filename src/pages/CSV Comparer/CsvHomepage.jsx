@@ -22,7 +22,7 @@ const CsvHomepage = () => {
   const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
   const token = JSON.parse(localStorage.getItem("userData"));
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState("");
 
   useEffect(() => {
     dataCtx.addToCsvHeader([]);
@@ -34,6 +34,7 @@ const CsvHomepage = () => {
       document.body.style.userSelect = "auto";
     };
   }, []);
+
   const compareHandler = () => {
     const {
       primaryKey = "",
@@ -41,16 +42,19 @@ const CsvHomepage = () => {
       firstInputFileName = "",
       secondInputFileName = "",
       firstInputCsvFiles = [],
-      secondInputCsvFiles = [],
+      // secondInputCsvFiles = [],
       imageColName = "",
       uploadZipImage = [],
+      fileId = "",
       formFeilds = [],
     } = dataCtx;
+    console.log(fileId, "file1w1w");
 
     if (firstInputCsvFiles.length === 0) {
       alert("Choose first CSV file");
       return;
     }
+    console.log(firstInputCsvFiles, "csv1");
 
     // if (secondInputCsvFiles.length === 0) {
     //   alert("Choose second CSV file");
@@ -79,9 +83,9 @@ const CsvHomepage = () => {
         const formData = new FormData();
         // Append file data to FormData
         formData.append("firstInputCsvFile", firstInputCsvFiles);
-        formData.append("secondInputCsvFile", secondInputCsvFiles);
+        // formData.append("secondInputCsvFile", secondInputCsvFiles);
         formData.append("zipImageFile", dataCtx.uploadZipImage);
-
+        formData.append("fileId", dataCtx.fileId);
         // Append other parameters to FormData
         formData.append("firstInputFileName", firstInputFileName);
         formData.append("secondInputFileName", secondInputFileName);
@@ -109,9 +113,10 @@ const CsvHomepage = () => {
             },
           }
         );
-        console.log(response.status);
+        // console.log(response.status);
 
-        console.log(response.data);
+        // console.log(response.data);
+
         // dataCtx.setCsvFile(response.data.data);
         // const modifiedRes = response.data.data.map((item) => {
         //   return { ...item, corrected: "" };
@@ -119,20 +124,27 @@ const CsvHomepage = () => {
         // dataCtx.addToCorrectedCsv(modifiedRes);
         setLoading(false);
 
-        // navigate("/comparecsv/assign_operator", { state: response.data });
+        navigate(`/comparecsv/assign_operator/${selectedTemplate}`, {state: response.data});
       } catch (err) {
         // alert("Error Occured : ", JSON.stringify(err.response.data.err));
-        const alertmsg = err.response.data.err;
-        alert(`Error Occured : ${alertmsg}`);
-        console.log(err.response.data.err);
+        // console.log(err.response);
+        if (err.response && err.response.data) {
+          const alertmsg = err.response.data.err;
+          alert(`Error Occured : ${alertmsg}`);
+          console.log(err.response.data.err);
+        }
       }
     };
     sendRequest();
   };
+
+  // const handleSelectAll = () => {
+  //   setSelectedOptions(dataCtx.csvOptions.map(option => option.value));
+  // };
   return (
     <>
       <main
-        className={`flex flex-col gap-5 bg-white rounded-md bg-gradient-to-r from-blue-500 to-blue-600 ${classes.homepage}`}
+        className={`flex flex-col gap-5 bg-white rounded-md bg-gradient-to-r from-blue-500 to-blue-500 ${classes.homepage}`}
       >
         <div
           className={`flex flex-col border-dashed pt-24 px-5 rounded-md xl:w-5/6 justify-center self-center ${classes.innerBox}`}
@@ -141,13 +153,23 @@ const CsvHomepage = () => {
             MATCH AND COMPARE DATA
           </h1>
           <div className="flex flex-row justify-between  gap-10 mb-6">
-            <NewSelect label="Select Template" onTemplateSelect={setSelectedTemplate} />
-            <NewSelect label="Select Csv Files" state="second" selectedTemplate={selectedTemplate} />
-           
+            <NewSelect
+              label="Select Template"
+              onTemplateSelect={setSelectedTemplate}
+            />
+            <NewSelect
+              label="Select Csv Files"
+              state="second"
+              selectedTemplate={selectedTemplate}
+            />
           </div>
           <div className="flex flex-row justify-between  gap-10 mb-6">
-            <NewSelect label="Select Zip Files" state="third" selectedTemplate={selectedTemplate}   />
-            <Input label="Select Paper 1" state="first" type="text/csv"/>
+            <NewSelect
+              label="Select Zip Files"
+              state="third"
+              selectedTemplate={selectedTemplate}
+            />
+            <Input label="Select Paper 1" state="first" type="text/csv" />
             {/* <Input label="Select Paper 2" state="second" type="text/csv" /> */}
             {/* <Input
               label="Select Image Zipfile"
@@ -170,16 +192,20 @@ const CsvHomepage = () => {
                 <p className="text-sm font-semibold align-bottom self-center ">
                   Select Key For Skipping Comparison
                 </p>
-                <Button>Clear All</Button>
+                {/* <Button onClick={handleSelectAll}>Select All</Button> */}
+                <Button>Select All</Button>
               </div>
-              <OptimisedList />
+              <OptimisedList
+              // selectedOptions={selectedOptions}
+              // setSelectedOptions={setSelectedOptions}
+              />
             </div>
             <div className="bg-opacity-95 border pl-2 pb-2  bg-slate-100 rounded sm:w-1/3 ">
               <div className="flex flex-row  pt-2 pb-2 justify-between self-center ">
                 <p className="text-sm font-semibold align-bottom self-center ">
                   Select Form Feilds For Mult or Blank
                 </p>
-                <Button >Clear All</Button>
+                <Button>Clear All</Button>
               </div>
               <MultList />
             </div>

@@ -13,6 +13,7 @@ const initialData = {
   secondInputCsvFiles: [],
   correctedCsv: {},
   zipImageFile: [],
+  fileId: null,
   imageColName: "",
   imageMappedData: [],
   csvFile: [],
@@ -40,6 +41,14 @@ const DataProvider = (props) => {
       return {
         ...item,
         primaryKey: key,
+      };
+    });
+  };
+  const modifyFileIdHandler = (key) => {
+    setDataState((item) => {
+      return {
+        ...item,
+        fileId: key,
       };
     });
   };
@@ -181,7 +190,6 @@ const DataProvider = (props) => {
   };
 
   const modifyTemplateDataHandler = (templateData) => {
-
     setDataState((item) => {
       return {
         ...item,
@@ -204,6 +212,7 @@ const DataProvider = (props) => {
     loginData: dataState.loginData,
     csvHeader: dataState.csvHeader,
     primaryKey: dataState.primaryKey,
+    fileId: dataState.fileId,
     fileOneDataName: dataState.fileOneDataName,
     skippingKey: dataState.skippingKey,
     firstInputFileName: dataState.firstInputFileName,
@@ -228,6 +237,7 @@ const DataProvider = (props) => {
     modifyIslogin: modifyIsloginHandler,
     addToCsvHeader: addToCsvHeaderHandler,
     addToPrimaryKey: addToPrimaryKeyHandler,
+    modifyFileId: modifyFileIdHandler,
     addToSkippingKey: addToSkippingKeyHandler,
     addFirstInputFileName: addFirstInputFileNameHandler,
     addSecondInputFileName: addSecondInputFileNameHandler,

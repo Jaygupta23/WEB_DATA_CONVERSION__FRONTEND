@@ -101,14 +101,15 @@ const DataMatching = () => {
         const templateData = response.find(
           (data) => data.id === parseInt(currentTaskData.templeteId)
         );
+        
         setTemplateHeaders(templateData);
       } catch (error) {
         console.log(error);
       }
     };
+    // console.log(currentTaskData)
     fetchTemplate();
   }, [currentTaskData]);
-
   // Api for updating the csv data in the backend
   const onCsvUpdateHandler = async () => {
     // const csvHeader = csvData[0];
@@ -212,14 +213,14 @@ const DataMatching = () => {
           onImageHandler("prev", currentIndex, csvData, currentTaskData);
         }
       };
-
+      
       window.addEventListener("keydown", handleKeyDown);
       return () => {
         window.removeEventListener("keydown", handleKeyDown);
       };
     }
   }, [csvData, currentTaskData, setCsvCurrentData, onCsvUpdateHandler]);
-
+ 
   // Handle Key
   const handleKeyDownJump = (e, index) => {
     if (e.key === "Tab") {
@@ -305,13 +306,16 @@ const DataMatching = () => {
       if (direction === "initial") {
         const objects = csvData[newIndex];
         allImagePaths = imageNames.map((key) => objects[key]);
+        console.log(allImagePaths)
         setCsvCurrentData(objects);
       } else {
         newIndex = direction === "next" ? newIndex + 1 : newIndex - 1;
         if (newIndex > 0 && newIndex < csvData.length) {
           setCurrentIndex(newIndex);
           const objects = csvData[newIndex];
+         
           allImagePaths = imageNames.map((key) => objects[key]);
+      
           setCsvCurrentData(objects);
         } else {
           toast.warning(
@@ -617,14 +621,49 @@ const DataMatching = () => {
       setCurrentIndex(matchingIndex);
       onImageHandler("initial", matchingIndex, response.data, taskData);
       setPopUp(false);
+      console.log(taskData )
     } catch (error) {
       toast.error(error?.response?.data?.error);
     }
   };
+  const onCompareTaskStartHandler = async (taskdata) => {
+    try {
+      // const response = await axios.post(
+      //   `http://${REACT_APP_IP}:4000/get/csvdata`,
+      //   { taskData: taskdata },
+      //   {
+      //     headers: {
+      //       token: token,
+      //     },
+      //   }
+      // );
+      // if (response.data.length === 1) {
+      //   toast.warning("No matching data was found.");
+      //   return;
+      // }
+      // let matchingIndex;
+      // for (let i = 0; i < response.data.length; i++) {
+      //   if (response.data[i]["rowIndex"] == taskdata.currentIndex) {
+      //     matchingIndex = i;
+      //     break;
+      //   }
+      // }
 
-  const onCompareTaskStartHandler = (taskdata) => {
-    localStorage.setItem("taskdata", JSON.stringify(taskdata));
-    navigate("/datamatching/correct_compare_csv", { state: taskdata });
+      // if (matchingIndex === undefined || matchingIndex === 0) {
+      //   matchingIndex = 1;
+      // }
+      // setCurrentIndex(matchingIndex);
+      // onImageHandler("initial", matchingIndex, response.data, taskdata);
+      // setPopUp(false);
+      if (taskdata?.taskStatus) {
+        toast.warning("Task is already completed.");
+        return;
+      }
+      localStorage.setItem("taskdata", JSON.stringify(taskdata));
+      navigate("/datamatching/correct_compare_csv", { state: taskdata });
+    } catch (error) {
+      toast.error(error?.response?.data?.error);
+    }
   };
 
   const onCompleteHandler = async () => {
@@ -667,7 +706,7 @@ const DataMatching = () => {
       imageRef.current.style.transformOrigin = "initial";
     }
   };
-
+  
   return (
     <>
       {(userRole === "Operator" || userRole === "Moderator") && (
@@ -792,11 +831,11 @@ const DataMatching = () => {
                         templateHeaders={templateHeaders}
                       />
                       <QuestionsDataSection
-                        csvCurrentData={csvCurrentData}   //whole row data 
-                        csvData={csvData}  //error questions data
+                        csvCurrentData={csvCurrentData} //whole row data
+                        csvData={csvData} //error questions data
                         templateHeaders={templateHeaders} //template header already present
-                        imageColName={imageColName} 
-                        currentFocusIndex={currentFocusIndex}     
+                        imageColName={imageColName}
+                        currentFocusIndex={currentFocusIndex}
                         inputRefs={inputRefs}
                         handleKeyDownJump={handleKeyDownJump}
                         changeCurrentCsvDataHandler={

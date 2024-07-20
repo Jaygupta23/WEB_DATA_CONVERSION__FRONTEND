@@ -1,44 +1,60 @@
-import React from "react";
+import React, { useState } from "react";
+import { MdOutlineRestartAlt } from "react-icons/md";
+import { FaCloudDownloadAlt, FaRegEdit } from "react-icons/fa";
+import DeactivateModal from "../../components/DeactivateModal";
 
-const AdminCompareTasks = ({ compareTask, onCompareTaskStartHandler }) => {
+const AdminCompareTasks = ({
+  compareTask,
+  onCompareTaskStartHandler,
+  onCompleteHandler,
+  setTaskEdit,
+  setTaskEditId,
+}) => {
+  const [modals, setModals] = useState(false);
+  // const modalClose = () => {
+  //   setModals(false);
+  // };
   return (
     <div>
+      {modals && (
+        <DeactivateModal isOpen={modals} onClose={() => setModals(false)} />
+      )}
       {compareTask?.map((taskData) => (
         <div key={taskData.id} className="flex">
-          <div className="whitespace-nowrap  w-[150px] py-2">
-            <div className="text-md text-center ">{taskData.name}</div>
+          <div className="whitespace-nowrap  w-[100px] py-2">
+            <div className="text-md text-center ">{taskData.taskName}</div>
           </div>
-          <div className="whitespace-nowrap w-[150px] py-2">
+          <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-md text-center">{taskData.userName}</div>
           </div>
-          <div className="whitespace-nowrap w-[80px] py-2">
+          <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-md text-center">{taskData.min}</div>
           </div>
-          <div className="whitespace-nowrap w-[80px] py-2">
+          <div className="whitespace-nowrap w-[100px] py-2">
             <div className="text-md text-center">{taskData.max}</div>
           </div>
-          <div className="whitespace-nowrap w-[200px] py-2">
+          <div className="whitespace-nowrap w-[150px] py-2">
             <div className="text-md text-center font-semibold border-2 py-1 ">
-              {taskData.TemplateType}
+              {taskData.moduleType}
             </div>
           </div>
-          <div className="whitespace-nowrap w-[200px] py-2">
-            <div className="text-md text-center ">
+          <div className="whitespace-nowrap w-[100px] py-2">
+            <div className="text-md text-center">
               <span
                 className={`inline-flex items-center justify-center rounded-full ${
-                  !taskData.blankTaskStatus || !taskData.multTaskStatus
+                  !taskData.taskStatus
                     ? "bg-amber-100 text-amber-700"
                     : "bg-emerald-100 text-emerald-700"
                 } px-2.5 py-0.5`}
               >
-                {!taskData.blankTaskStatus || !taskData.multTaskStatus ? (
+                {!taskData.taskStatus ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
                     stroke="currentColor"
-                    className="-ms-1 me-1.5 h-4 w-4"
+                    className="-ms-1 me-1.5 h-4 w-4 ml-2"
                   >
                     <path
                       strokeLinecap="round"
@@ -53,7 +69,7 @@ const AdminCompareTasks = ({ compareTask, onCompareTaskStartHandler }) => {
                     viewBox="0 0 24 24"
                     strokeWidth="1.5"
                     stroke="currentColor"
-                    className="-ms-1 me-1.5 h-4 w-4"
+                    className="-ms-1 me-1.5 h-4 w-4  ml-2"
                   >
                     <path
                       strokeLinecap="round"
@@ -62,37 +78,51 @@ const AdminCompareTasks = ({ compareTask, onCompareTaskStartHandler }) => {
                     />
                   </svg>
                 )}
-                <p className="whitespace-nowrap text-sm">
-                  {taskData.blankTaskStatus && taskData.multTaskStatus
-                    ? "Completed"
-                    : "Pending"}
-                </p>
               </span>
             </div>
           </div>
-          <div className="whitespace-nowrap text-center w-[200px] py-2">
-            <button
-              className={`rounded px-4 py-1 font-semibold ${
+          <div className="whitespace-nowrap text-center w-[100px] py-2">
+            {/* <button
+              className={`rounded-3xl px-4 py-1 font-semibold  ${
                 taskData.blankTaskStatus && taskData.multTaskStatus
-                  ? "bg-teal-300"
-                  : "bg-gray-400 text-gray-600 cursor-not-allowed"
+                  ? "bg-indigo-500 text-white border border-indigo-500"
+                  : "bg-gray-400 text-gray-600  cursor-not-allowed"
               }`}
               disabled={!taskData.blankTaskStatus || !taskData.multTaskStatus}
-            >
-              Start Again
-            </button>
-          </div>
-          <div className="whitespace-nowrap text-center w-[200px] py-2">
+            > */}
             <button
-              onClick={() => onCompareTaskStartHandler(taskData)}
-              className="rounded border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white"
+              onClick={() => onCompleteHandler(taskData)}
+              className={`rounded-3xl px-4 py-1 font-semibold ${
+                taskData.taskStatus
+                  ? "bg-indigo-500 text-white border border-indigo-500"
+                  : "bg-gray-400 text-gray-600 cursor-not-allowed"
+              }`}
+              disabled={!taskData.taskStatus}
             >
-              Download
+              <MdOutlineRestartAlt />
+            </button>
+
+            {/* </button> */}
+          </div>
+          <div className="whitespace-nowrap text-center w-[100px] py-2">
+            <button
+              onClick={() => {
+                onCompareTaskStartHandler(taskData);
+                setModals(true);
+              }}
+              className="rounded-3xl px-4 py-1 font-semibold bg-indigo-500 text-white border border-indigo-500" >
+              <FaCloudDownloadAlt />
             </button>
           </div>
-          <div className="whitespace-nowrap text-center w-[200px] py-2">
+          <div
+            className="whitespace-nowrap text-center w-[100px] py-2"
+            onClick={() => {
+              setTaskEditId(taskData.id);
+              setTaskEdit(true);
+            }}
+          >
             <button className="rounded border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white">
-              Edit
+              <FaRegEdit />
             </button>
           </div>
         </div>

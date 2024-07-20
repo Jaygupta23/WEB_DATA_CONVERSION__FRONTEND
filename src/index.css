@@ -26,14 +26,14 @@ a {
   text-decoration: none !important;
 }
 
-.scannerbg {
+/* .scannerbg { */
   /* background-image: url("assets/images/scannerbg.jpg");
 background-position: 50% 0;
 background-size: cover;
 height: auto; */
   /* height: auto;
 background: #3987da; */
-}
+/* } */
 
 /* .csvuploader {
 background-image: url("assets/images/csvuploaderbg.jpg");
@@ -41,11 +41,11 @@ background-position: 50% 0;
 background-size: cover;
 } */
 
-.templatemapping {
+/* .templatemapping { */
   /* background-image: url("assets/images/templatemappingbg.jpg");
 background-position: 50% 0;
 background-size: cover; */
-}
+/* } */
 /* .duplicateImg {
 background-image: url("assets/images/duplicateImg2.jpg");
 background-position: 50% 0;

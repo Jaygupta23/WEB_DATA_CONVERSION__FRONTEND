@@ -42,7 +42,7 @@ const Correction = () => {
           },
         }
       );
-
+      console.log(response,"--------------------")
       setTableData(response.data);
     };
     req();
@@ -58,6 +58,7 @@ const Correction = () => {
           },
         }
       );
+  
       setTableData(response.data);
       setMaximum(parseInt(response.data.max));
       setMinimum(parseInt(response.data.min));

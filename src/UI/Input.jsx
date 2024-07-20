@@ -8,6 +8,7 @@ const   Input = (props) => {
   const datactx = useContext(dataContext);
   const fileHandler = (event) => {
     const file = event.target.files[0];
+    // console.log(file,"files**************")
     if (file) {
       const formData = new FormData();
       formData.append("file", file);
@@ -29,17 +30,7 @@ const   Input = (props) => {
           datactx.addFirstInputFileName(file.name);
           datactx.addFirstInputCsvFile(file);
           break;
-        case "second":
-          datactx.addSecondInputFileName(file.name);
-          datactx.addSecondInputCsvFile(file);
-          break;
-        case "third":
-          (async function () {
-            // const images = await extractImagesFromZip(file);
-            datactx.setUploadZipImage(file);
-            // datactx.addZipImageFile(images);
-          })();
-          break;
+        
         default:
           break;
       }

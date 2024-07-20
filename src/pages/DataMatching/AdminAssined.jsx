@@ -22,17 +22,10 @@ const AdminAssined = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const token = JSON.parse(localStorage.getItem("userData"));
-        const response = await axios.get(
-          `http://${REACT_APP_IP}:4000/assignedTasks`,
-          {
-            headers: {
-              token: token,
-            },
-          }
-        );
-        const AssignedData = response.data.assignedData;
-
+        const tasks = await onGetAllTasksHandler();
+        const users = await onGetAllUsersHandler();
+        setAllUsers(users.users);
+      // console.log(AssignedData,"-----")
         // const verifiedUser = await onGetVerifiedUserHandler();
         // const tasks = await onGetTaskHandler(verifiedUser.user.id);
         // const templateData = await onGetTemplateHandler();
@@ -40,20 +33,19 @@ const AdminAssined = () => {
         // const uploadTask = AssignedData.filter((task) => {
         //   return task.TemplateType === "Data Entry";
         // });
-        const comTask = AssignedData.filter((task) => {
-          return task.TemplateType === "CSVCompare";
-        });
-
-        // const updatedCompareTasks = comTask.map((task) => {
-        //   const matchedTemplate = templateData.find(
-        //     (template) => template.id === parseInt(task.templeteId)
-        //   );
-        //   if (matchedTemplate) {
-        //     return {
-        //       ...task,
-        //       templateName: matchedTemplate.name,
-        //     };
-        //   }
+        const comTask = tasks.filter(
+          (task) => task.moduleType === "CSV Compare"
+        );    
+        const updatedCompareTasks = comTask.map((task) => {
+          // const matchedTemplate = templateData.find(
+          //   (template) => template.id === parseInt(task.templeteId)
+          // );
+          // if (matchedTemplate) {
+          //   return {
+          //     ...task,
+          //     templateName: matchedTemplate.name,
+          //   };
+          // }
         //   return task;
         // });
         // const updatedTasks = uploadTask.map((task) => {
@@ -67,10 +59,20 @@ const AdminAssined = () => {
         //     };
         //   }
         //   return task;
-        // });
+        const matchedUser = users.users.find(
+          (user) => user.id === parseInt(task.userId)
+        );
+
+        const updatedTask = { ...task };
+
+        if (matchedUser) {
+          updatedTask.userName = matchedUser.userName;
+        }
+      return updatedTask;
+      });
         // setAllTasks(updatedTasks);
         // setMatchingTask(uploadTask);
-        setCompareTask(comTask);
+        setCompareTask(updatedCompareTasks);
       } catch (error) {
         console.log(error);
       }
@@ -88,7 +90,7 @@ const AdminAssined = () => {
         const uploadTask = tasks.filter(
           (task) => task.moduleType === "Data Entry"
         );
-
+// console.log(uploadTask)
         const updatedTasks = uploadTask.map((task) => {
           const matchedTemplate = templateData.find(
             (template) => template.id === parseInt(task.templeteId)
@@ -255,8 +257,15 @@ const AdminAssined = () => {
         }
         return task;
       });
+      const updatedTask = compareTask.map((task) => {
+        if (task.id === currentTask.id) {
+          return { ...task, taskStatus: false };
+        }
+        return task;
+      });
 
       setMatchingTask(updatedTasks);
+      setCompareTask(updatedTask)
       toast.success("Task status updated.");
     } catch (error) {
       toast.error(error.message);
@@ -291,8 +300,19 @@ const AdminAssined = () => {
         }
         return task;
       });
+      const updatedTask = compareTask.map((task) => {
+        if (task.id == taskEditId) {
+          const taskData = {
+            ...task,
+            userName: user.userName,
+          };
+          return taskData;
+        }
+        return task;
+      });
 
       setMatchingTask(updatedTasks);
+      setCompareTask(updatedTask);
       toast.success("Task updated successfully.");
       setTaskEditId("");
       setTaskEdit(false);
@@ -302,10 +322,10 @@ const AdminAssined = () => {
   };
 
   return (
-    <div className="h-[100vh] flex justify-center items-center bg-gradient-to-r from-blue-700 to-purple-700 templatemapping pt-20">
+    <div className="h-[100vh] flex justify-center items-center bg-gradient-to-r from-blue-500 to-blue-600 templatemapping pt-20">
       <div className="">
         {/* MAIN SECTION  */}
-        <section className=" lg:mx-auto max-w-6xl px-8 py-10 bg-white rounded-xl w-[100vw]">
+        <section className=" lg:mx-auto max-w-5xl px-8 py-10 bg-white rounded-xl w-[100vw]">
           <div>
             <div>
               <h2 className="text-3xl font-semibold">Assigned Tasks</h2>
@@ -319,7 +339,7 @@ const AdminAssined = () => {
                     <div className="bg-gray-50">
                       <div className="flex ">
                         <div className="py-3 text text-center font-semibold text-gray-700 w-[100px]">
-                          Template
+                          Task Name
                         </div>
                         <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
                           Assignee.
@@ -330,7 +350,7 @@ const AdminAssined = () => {
                         <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
                           Max
                         </div>
-                        <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
+                        <div className="py-3 text-center text font-semibold text-gray-700 w-[150px]">
                           Module Type
                         </div>
                         <div className="py-3 text-center text font-semibold text-gray-700 w-[100px]">
@@ -350,6 +370,9 @@ const AdminAssined = () => {
                     <div className="divide-y divide-gray-200 bg-white overflow-y-auto h-[250px]">
                       <AdminCompareTasks
                         compareTask={compareTask}
+                        onCompleteHandler={onCompleteHandler}
+                        setTaskEdit={setTaskEdit}
+                        setTaskEditId={setTaskEditId}
                         onCompareTaskStartHandler={onCompareTaskStartHandler}
                       />
                       <AdminMatchingTasks

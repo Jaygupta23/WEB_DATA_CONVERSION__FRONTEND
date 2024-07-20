@@ -17,11 +17,25 @@ const NewSelect = (props) => {
   const fetchFile = async (templateId) => {
     try {
       const response = await fetchFilesAssociatedWithTemplate(templateId);
-      const csvOptions = response.map((item) => ({
+      const tasks = await onGetAllTasksHandler();
+      const taskStatusArr = tasks.filter((task) => !(task.taskStatus));
+      
+      const filteredFile = [];
+
+      for (let i = 0; i < tasks.length; i++) {
+        for (let j = 0; j < response.length; j++) {
+          if (taskStatusArr[i].fileId == response[j].id) {
+            filteredFile.push(response[j]);
+            break;
+          }
+        }
+      }
+
+      const csvOptions = filteredFile.map((item) => ({
         label: item.csvFile,
         value: item.id,
       }));
-      const zipOptions = response.map((item) => ({
+      const zipOptions = filteredFile.map((item) => ({
         label: item.zipFile,
         value: item.id,
       }));
@@ -36,26 +50,13 @@ const NewSelect = (props) => {
     const fetchData = async () => {
       try {
         const templates = await onGetTemplateHandler();
-        const tasks = await onGetAllTasksHandler();
-
-        const taskStatusArr = tasks.filter((task) => task.taskStatus);
-
-        const filteredTemplates = [];
-
-        for (let i = 0; i < taskStatusArr.length; i++) {
-          for (let j = 0; j < templates.length; j++) {
-            if (taskStatusArr[i].templeteId == templates[j].id) {
-              filteredTemplates.push(templates[j]);
-              break;
-            }
-          }
-        }
-
+        
+     
         const options = templates.map((item) => ({
           label: item.name,
           value: item.id,
         }));
-
+        // console.log(options,"options")
         setOptions(options);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -83,9 +84,13 @@ const NewSelect = (props) => {
     } else if (props.label === "Select Template") {
       props.onTemplateSelect(selectedOption.value);
       fetchFile(selectedOption.value);
+    } else if (props.label === "Select Csv Files") {
+      dataCtx.addSecondInputFileName(selectedOption.label);
+    } else if (props.label === "Select Zip Files") {
+      dataCtx.setUploadZipImage(selectedOption.label);
+      dataCtx.modifyFileId(selectedOption.value)
     }
   };
-
   const customStyles = {
     menu: (provided) => ({
       ...provided,
@@ -114,8 +119,7 @@ const NewSelect = (props) => {
       styles={{ ...customStyles, ...customDropdownStyles }}
       getOptionLabel={(option) => option.label}
       getOptionValue={(option) => option.value}
-      // styles={customStyles}
-      className="w-[100%] pt-5 text-md leading-7 "
+      className="w-[100%] pt-5 text-md leading-7"
       placeholder={props.label}
     />
   );
