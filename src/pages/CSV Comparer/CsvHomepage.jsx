@@ -27,13 +27,15 @@ const CsvHomepage = () => {
   useEffect(() => {
     dataCtx.addToCsvHeader([]);
   }, []);
+  
   useEffect(() => {
     document.body.style.userSelect = "none";
     return () => {
-      // Cleanup function to reset the style when the component unmounts
       document.body.style.userSelect = "auto";
     };
   }, []);
+  
+
 
   const compareHandler = () => {
     const {
@@ -41,31 +43,28 @@ const CsvHomepage = () => {
       skippingKey = "",
       firstInputFileName = "",
       secondInputFileName = "",
-      firstInputCsvFiles = [],
-      // secondInputCsvFiles = [],
-      imageColName = "",
       uploadZipImage = [],
       fileId = "",
+      firstInputCsvFiles = [],
+      imageColName = "",
       formFeilds = [],
     } = dataCtx;
-    console.log(fileId, "file1w1w");
 
+    if (secondInputFileName.length === 0) {
+      alert("Please Select template then select second CSV file");
+      return;
+    }
+
+    if (dataCtx.uploadZipImage.length === 0) {
+      alert("Please select template then select image zip file");
+      return;
+    }
+    
     if (firstInputCsvFiles.length === 0) {
       alert("Choose first CSV file");
       return;
     }
-    console.log(firstInputCsvFiles, "csv1");
-
-    // if (secondInputCsvFiles.length === 0) {
-    //   alert("Choose second CSV file");
-    //   return;
-    // }
-
-    // if (uploadZipImage.length === 0) {
-    //   alert("Please select image zip file");
-    //   return;
-    // }
-
+    
     if (primaryKey === "") {
       alert("Please select primary key");
       return;
@@ -77,16 +76,12 @@ const CsvHomepage = () => {
     }
 
     const sendRequest = async () => {
-      // Create a FormData object
       try {
         setLoading(true);
         const formData = new FormData();
-        // Append file data to FormData
         formData.append("firstInputCsvFile", firstInputCsvFiles);
-        // formData.append("secondInputCsvFile", secondInputCsvFiles);
-        formData.append("zipImageFile", dataCtx.uploadZipImage);
-        formData.append("fileId", dataCtx.fileId);
-        // Append other parameters to FormData
+        formData.append("zipImageFile", uploadZipImage);
+        formData.append("fileId", fileId);
         formData.append("firstInputFileName", firstInputFileName);
         formData.append("secondInputFileName", secondInputFileName);
         formData.append("primaryKey", primaryKey);
@@ -94,7 +89,6 @@ const CsvHomepage = () => {
         formData.append("imageColName", imageColName);
         formData.append("formFeilds", formFeilds);
 
-        // Make the POST request with Axios
         const response = await axios.post(
           `http://${REACT_APP_IP}:4000/compareData`,
           formData,
@@ -104,43 +98,29 @@ const CsvHomepage = () => {
               token: token,
             },
             onUploadProgress: (progressEvent) => {
-              // Calculate percentage completed
               const percentage = Math.round(
                 (progressEvent.loaded * 100) / progressEvent.total
               );
-              // Update state with percentage completed
               setProgress(percentage);
             },
           }
         );
-        // console.log(response.status);
-
-        // console.log(response.data);
-
-        // dataCtx.setCsvFile(response.data.data);
-        // const modifiedRes = response.data.data.map((item) => {
-        //   return { ...item, corrected: "" };
-        // });
-        // dataCtx.addToCorrectedCsv(modifiedRes);
         setLoading(false);
-
-        navigate(`/comparecsv/assign_operator/${selectedTemplate}`, {state: response.data});
+        navigate(`/comparecsv/assign_operator/${selectedTemplate}`, {
+          state: response.data,
+        });
       } catch (err) {
-        // alert("Error Occured : ", JSON.stringify(err.response.data.err));
-        // console.log(err.response);
         if (err.response && err.response.data) {
           const alertmsg = err.response.data.err;
           alert(`Error Occured : ${alertmsg}`);
           console.log(err.response.data.err);
         }
+       setLoading(false)
       }
     };
     sendRequest();
   };
 
-  // const handleSelectAll = () => {
-  //   setSelectedOptions(dataCtx.csvOptions.map(option => option.value));
-  // };
   return (
     <>
       <main
@@ -158,7 +138,7 @@ const CsvHomepage = () => {
               onTemplateSelect={setSelectedTemplate}
             />
             <NewSelect
-              label="Select Csv Files"
+              label="Select Csv Files 2"
               state="second"
               selectedTemplate={selectedTemplate}
             />
@@ -169,13 +149,7 @@ const CsvHomepage = () => {
               state="third"
               selectedTemplate={selectedTemplate}
             />
-            <Input label="Select Paper 1" state="first" type="text/csv" />
-            {/* <Input label="Select Paper 2" state="second" type="text/csv" /> */}
-            {/* <Input
-              label="Select Image Zipfile"
-              state="third"
-              type="application/zip,application/x-zip-compressed"
-            /> */}
+            <Input label="Select Csv Files 1" state="first" type="text/csv" />
           </div>
           <div className="flex flex-row justify-between  gap-10 mb-6">
             <div className="w-1/2 text-white">
@@ -192,13 +166,9 @@ const CsvHomepage = () => {
                 <p className="text-sm font-semibold align-bottom self-center ">
                   Select Key For Skipping Comparison
                 </p>
-                {/* <Button onClick={handleSelectAll}>Select All</Button> */}
                 <Button>Select All</Button>
               </div>
-              <OptimisedList
-              // selectedOptions={selectedOptions}
-              // setSelectedOptions={setSelectedOptions}
-              />
+              <OptimisedList />
             </div>
             <div className="bg-opacity-95 border pl-2 pb-2  bg-slate-100 rounded sm:w-1/3 ">
               <div className="flex flex-row  pt-2 pb-2 justify-between self-center ">

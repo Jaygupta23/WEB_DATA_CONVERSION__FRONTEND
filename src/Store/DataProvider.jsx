@@ -13,7 +13,7 @@ const initialData = {
   secondInputCsvFiles: [],
   correctedCsv: {},
   zipImageFile: [],
-  fileId: null,
+  fileId: "",
   imageColName: "",
   imageMappedData: [],
   csvFile: [],

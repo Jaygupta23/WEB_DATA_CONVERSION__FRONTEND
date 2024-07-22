@@ -13,7 +13,7 @@ const dataContext = React.createContext({
   secondInputCsvFiles: [],
   correctedCsv: {},
   zipImageFile: [],
-  fileId: null,
+  fileId: "",
   imageMappedData: [],
   csvFile: [],
   csvDataWithImage: [],

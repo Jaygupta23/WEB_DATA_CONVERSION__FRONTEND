@@ -27,17 +27,18 @@ const Assignee = () => {
   const { id } = useParams();
   const [templateName, setTemplateName] = useState("");
   const state = location.state;
+  console.log(state)
   // console.log(state)    
   useEffect(() => {
     const input = document.getElementById("templateInputName");
     input.focus();
   }, []);
 
-  useEffect(() => {
-    if (!state) {
+
+    if (!state || null) {
       navigate("/comparecsv", { replace: true });
     }
-  }, []);
+
 
   useEffect(() => {
     const confirmExit = (e) => {
@@ -114,7 +115,7 @@ const Assignee = () => {
 
     if (!input.value) {
       input.focus();
-      toast.warning("Template name cannot be empty.");
+      toast.warning("Task name cannot be empty.");
       return;
     }
 
@@ -148,6 +149,13 @@ const Assignee = () => {
   };
   // console.log(dataCtx.fileId)
   const onTaskSubmitHandler = async () => {
+    console.log(location.state.data.length - taskValue.min + 1)
+    if(!(location.state.data.length - taskValue.min + 1  === 0)) {
+      toast.warning("Please assign all rows")
+      setShowModal(false)
+      return
+    }
+
     try {
       await axios.post(
         `http://${REACT_APP_IP}:4000/assign`,
@@ -180,12 +188,13 @@ const Assignee = () => {
               <div className="flex items-start sm:gap-8">
                 <div className="flex gap-3">
                   <h1 className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white">
-                    Total Errors Rows - {state && location.state.data.length}
-                  </h1>
-                  <h1 className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white">
                     Remaining Errors Rows -{" "}
                     {state && location.state.data.length - taskValue.min + 1}
                   </h1>
+                  <h1 className="rounded border border-indigo-500 bg-indigo-500 px-3 py-2 font-medium text-white">
+                    Total Errors Rows - {state && location.state.data.length}
+                  </h1>
+                  
                 </div>
               </div>
             </article>
@@ -334,6 +343,7 @@ const Assignee = () => {
               <input
                 type="text"
                 id="templateInputName"
+                autoFocus
                 placeholder="Enter Task name"
                 className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-400"
                 onChange={(e) => {

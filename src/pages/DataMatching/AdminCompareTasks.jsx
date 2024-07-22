@@ -11,13 +11,14 @@ const AdminCompareTasks = ({
   setTaskEditId,
 }) => {
   const [modals, setModals] = useState(false);
+  const [taskId, setTaskId] = useState(null);
   // const modalClose = () => {
   //   setModals(false);
   // };
   return (
     <div>
       {modals && (
-        <DeactivateModal isOpen={modals} onClose={() => setModals(false)} />
+        <DeactivateModal isOpen={modals} onClose={() => setModals(false)} taskId = {taskId} />
       )}
       {compareTask?.map((taskData) => (
         <div key={taskData.id} className="flex">
@@ -105,9 +106,9 @@ const AdminCompareTasks = ({
             {/* </button> */}
           </div>
           <div className="whitespace-nowrap text-center w-[100px] py-2">
-            <button
+            <button 
               onClick={() => {
-                onCompareTaskStartHandler(taskData);
+                setTaskId(taskData.id)
                 setModals(true);
               }}
               className="rounded-3xl px-4 py-1 font-semibold bg-indigo-500 text-white border border-indigo-500" >

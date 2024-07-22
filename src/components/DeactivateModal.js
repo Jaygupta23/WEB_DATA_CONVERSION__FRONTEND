@@ -1,7 +1,99 @@
 import React from "react";
 import { FaCloudDownloadAlt } from "react-icons/fa";
+import axios from "axios";
+import { REACT_APP_IP } from "../services/common";
+import { saveAs } from "file-saver";
+const token = JSON.parse(localStorage.getItem("userData"));
 
-const DeactivateModal = ({ isOpen, onClose }) => {
+const DeactivateModal = ({ isOpen, onClose, taskId }) => {
+
+  const ErrorCorrectedFileHandler = async () => {
+    try {
+      const response = await axios.get(
+        `http://${REACT_APP_IP}:4000/download/errorCorrectedCsv/${taskId}`,
+        {
+          responseType: "blob", // Important for handling binary data
+          headers: {
+            token: token,
+          },
+        }
+      );
+  
+      // Extract the filename from the response headers
+      const contentDisposition = response.headers['content-disposition'];
+      const fileName = contentDisposition
+        ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+        : 'error_corrected_file';
+  
+      // Append the current timestamp to the filename
+      const timestamp = new Date().toISOString().replace(/:/g, '-');
+      const fullFileName = `${fileName}_${timestamp}.csv`;
+  
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+  
+      // Create a temporary link element and trigger the download
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", fullFileName); // Use the filename with timestamp
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+  
+      // Clean up the URL object
+      window.URL.revokeObjectURL(url);
+  
+    } catch (error) {
+      console.error("Error downloading the file", error);
+    }
+  };
+  
+  
+  const CorrectedFileHandler = async () => {
+    try {
+      // Fetch the corrected file from the server
+      const response = await axios.get(
+        `http://${REACT_APP_IP}:4000/download/correctedCsv/${taskId}`,
+        {
+          responseType: 'blob', // Important for downloading files
+          headers: {
+            token: token,
+          },
+        }
+      );
+  
+      // Log all response headers for debugging
+      console.log('Response Headers:', response.headers);
+  
+      // Extract the original filename from the response headers
+      const originalFilenameWithTimestamp = response.headers['x-original-filename'] || 'corrected_file.csv';
+      console.log('Original Filename:', originalFilenameWithTimestamp);
+  
+      // Remove everything before the underscore, including the underscore itself
+      const filenameWithUnderscore = originalFilenameWithTimestamp.replace(/^[^_]*_/, '');
+      
+      // Append the new timestamp to the filename
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const fullFileName = `${filenameWithUnderscore}_${timestamp}.csv`;
+      
+      // Create a URL for the file and initiate download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fullFileName); // Specify the file name with new timestamp
+      document.body.appendChild(link);
+      link.click();
+  
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url); // Optionally, release the URL object
+  
+    } catch (error) {
+      console.error('Error downloading the file:', error);
+    }
+  };
+  
+  
   return (
     <div
       className="relative z-10"
@@ -21,13 +113,13 @@ const DeactivateModal = ({ isOpen, onClose }) => {
               <div className="sm:flex sm:items-start">
                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
                   <h3
-                    className="text-2xl font-semibold leading-6 text-gray-700 "
+                    className="text-2xl font-semibold leading-6 text-gray-700"
                     id="modal-title"
                   >
                     Download File
                   </h3>
-                  <div className="mt-6 px-6 ">
-                  <div className="flex justify-between my-3 gap-2">
+                  <div className="mt-6 px-6">
+                    <div className="flex justify-between my-3 gap-2">
                       <h3
                         className="text-lg font-semibold leading-6 text-blue-500 w-40"
                         id="modal-title"
@@ -35,19 +127,25 @@ const DeactivateModal = ({ isOpen, onClose }) => {
                         Error Corrected File
                       </h3>
                       <button
-                       className="rounded-3xl border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white"
-                      ><FaCloudDownloadAlt /></button>
+                        className="rounded-3xl border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white"
+                        onClick={ErrorCorrectedFileHandler}
+                      >
+                        <FaCloudDownloadAlt />
+                      </button>
                     </div>
                     <div className="flex justify-between my-3 gap-2">
                       <h3
                         className="text-lg font-semibold leading-6 text-blue-500 w-40"
                         id="modal-title"
                       >
-                         Corrected File
+                        Corrected File
                       </h3>
                       <button
-                       className="rounded-3xl border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white"
-                      ><FaCloudDownloadAlt /></button>
+                        className="rounded-3xl border border-indigo-500 bg-indigo-500 px-4 py-1 font-semibold text-white"
+                        onClick={CorrectedFileHandler}
+                      >
+                        <FaCloudDownloadAlt />
+                      </button>
                     </div>
                   </div>
                 </div>

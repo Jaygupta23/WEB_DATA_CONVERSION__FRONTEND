@@ -18,19 +18,24 @@ const NewSelect = (props) => {
     try {
       const response = await fetchFilesAssociatedWithTemplate(templateId);
       const tasks = await onGetAllTasksHandler();
-      const taskStatusArr = tasks.filter((task) => !(task.taskStatus));
-      
+      const taskStatusArr = tasks.filter((task) => task.taskStatus);
+         
       const filteredFile = [];
-
-      for (let i = 0; i < tasks.length; i++) {
-        for (let j = 0; j < response.length; j++) {
-          if (taskStatusArr[i].fileId == response[j].id) {
-            filteredFile.push(response[j]);
+      const seenFileIds = new Set();
+  
+      for (let i = 0; i < tasks?.length; i++) {
+        for (let j = 0; j < response?.length; j++) {
+         
+          if (taskStatusArr[i]?.fileId == response[j]?.id) {
+            if (!seenFileIds.has(response[j].id)) {
+              filteredFile.push(response[j]);
+              seenFileIds.add(response[j].id);
+            }
             break;
           }
         }
       }
-
+     
       const csvOptions = filteredFile.map((item) => ({
         label: item.csvFile,
         value: item.id,
@@ -45,6 +50,7 @@ const NewSelect = (props) => {
       console.error("Error fetching files:", error);
     }
   };
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,7 +72,7 @@ const NewSelect = (props) => {
     if (props.label === "Select Template") {
       fetchData();
     } else if (
-      (props.label === "Select Csv Files" ||
+      (props.label === "Select Csv Files 2" ||
         props.label === "Select Zip Files") &&
       props.selectedTemplate
     ) {
@@ -84,7 +90,7 @@ const NewSelect = (props) => {
     } else if (props.label === "Select Template") {
       props.onTemplateSelect(selectedOption.value);
       fetchFile(selectedOption.value);
-    } else if (props.label === "Select Csv Files") {
+    } else if (props.label === "Select Csv Files 2") {
       dataCtx.addSecondInputFileName(selectedOption.label);
     } else if (props.label === "Select Zip Files") {
       dataCtx.setUploadZipImage(selectedOption.label);
@@ -105,7 +111,7 @@ const NewSelect = (props) => {
   };
 
   const optionsToShow =
-    props.label === "Select Csv Files"
+    props.label === "Select Csv Files 2"
       ? fileOptions
       : props.label === "Select Zip Files"
       ? zipFileOptions
